@@ -10,6 +10,10 @@
 #define __VECTOR_H__
 #endif
 
+#ifndef __SOLDIER_H__
+#include "soldier.h"
+#endif
+
 class MVCTime;
 
 class MVC_Model
@@ -29,6 +33,8 @@ public:
 	float m_testY;
 	float m_moveX;
 	float m_moveY;
+
+	SoldierSMControl thing;
 
 	MVCTime* m_timer;
 private: 

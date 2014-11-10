@@ -29,7 +29,7 @@ public:
 
 	int PushNewTime(int limit);
 
-	bool TestTime(int num,bool reSet);
+	bool TestTime(int num,bool reset);
 	void ResetTime(int num);
 
 	int GetTimeInterval(int num);

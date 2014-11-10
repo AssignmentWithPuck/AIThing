@@ -2,11 +2,17 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AI_assn_1", "AI_assn_1\AI_assn_1.vcxproj", "{3C345128-BBBC-41F4-A23F-7D9289302C77}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E817338A-C77A-430C-A1DA-EBB8D2CCF2C2} = {E817338A-C77A-430C-A1DA-EBB8D2CCF2C2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MVC_2D_framework", "MVC_2D_framework\MVC_2D_framework.vcxproj", "{062156F6-ABD4-4F78-AFC2-16D74BB251BD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3C345128-BBBC-41F4-A23F-7D9289302C77} = {3C345128-BBBC-41F4-A23F-7D9289302C77}
+		{E817338A-C77A-430C-A1DA-EBB8D2CCF2C2} = {E817338A-C77A-430C-A1DA-EBB8D2CCF2C2}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utility", "utility\utility.vcxproj", "{E817338A-C77A-430C-A1DA-EBB8D2CCF2C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,6 +28,10 @@ Global
 		{062156F6-ABD4-4F78-AFC2-16D74BB251BD}.Debug|Win32.Build.0 = Debug|Win32
 		{062156F6-ABD4-4F78-AFC2-16D74BB251BD}.Release|Win32.ActiveCfg = Release|Win32
 		{062156F6-ABD4-4F78-AFC2-16D74BB251BD}.Release|Win32.Build.0 = Release|Win32
+		{E817338A-C77A-430C-A1DA-EBB8D2CCF2C2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E817338A-C77A-430C-A1DA-EBB8D2CCF2C2}.Debug|Win32.Build.0 = Debug|Win32
+		{E817338A-C77A-430C-A1DA-EBB8D2CCF2C2}.Release|Win32.ActiveCfg = Release|Win32
+		{E817338A-C77A-430C-A1DA-EBB8D2CCF2C2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

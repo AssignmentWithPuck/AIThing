@@ -1,9 +1,3 @@
-//*************************************************************************************************************************************//
-//
-//	Original MVC framework made by Mr Toh Da Jun for DM2231 Game Development Techniques
-//	Adapted and modified by Kennard Kee Wei Sheng
-//
-//************************************************************************************************************************************//
 #ifndef __MVC_MODEL_H__
 #include "MVC_Model.h"
 #endif
@@ -39,10 +33,12 @@ bool MVC_Model::InitPhase2(void)
 void MVC_Model::Update(void)
 {
 	m_timer->UpdateTime();
+	thing.switchState();
 	if(m_timer->TestFramerate())
 	{
 		m_testX+=m_moveX*m_timer->GetDelta();
 		m_testY+=m_moveY*m_timer->GetDelta();
 	}
+	thing.update();
 }
 

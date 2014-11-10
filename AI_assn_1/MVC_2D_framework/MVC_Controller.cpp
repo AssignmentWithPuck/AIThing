@@ -182,6 +182,11 @@ void MVC_Controller::ProcKeyboard()
 	{
 		m_theModel->m_moveX=0;
 		m_theModel->m_moveY=0;
+		m_theModel->thing.m_underFire=true;
+	}
+	else
+	{
+		m_theModel->thing.m_underFire=false;
 	}
 	if(temp[ProcKeys('d')])
 	{
