@@ -76,12 +76,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engineer.cpp" />
     <ClCompile Include="mian.cpp" />
     <ClCompile Include="soldier.cpp" />
+    <ClCompile Include="Turret.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\AI_header.h" />
     <ClInclude Include="..\include\soldier.h" />
+    <ClInclude Include="..\include\vector3D.h" />
+    <ClInclude Include="Engineer.h" />
+    <ClInclude Include="Turret.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
