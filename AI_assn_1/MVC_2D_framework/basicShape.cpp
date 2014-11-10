@@ -21,6 +21,7 @@
 #define __MATH_H__
 #endif
 
+
 using namespace basicShape;
 
 float basicShape::GetRad(float degree)
