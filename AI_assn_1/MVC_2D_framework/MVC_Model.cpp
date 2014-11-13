@@ -33,12 +33,12 @@ bool MVC_Model::InitPhase2(void)
 void MVC_Model::Update(void)
 {
 	m_timer->UpdateTime();
-	thing.switchState();
+	thing.SwitchState();
 	if(m_timer->TestFramerate())
 	{
 		m_testX+=m_moveX*m_timer->GetDelta();
 		m_testY+=m_moveY*m_timer->GetDelta();
 	}
-	thing.update();
+	thing.Update(m_timer->GetDelta());
 }
 

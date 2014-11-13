@@ -27,6 +27,9 @@
     <ClCompile Include="Engineer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bulletHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\AI_header.h">

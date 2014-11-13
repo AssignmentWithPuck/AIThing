@@ -1,5 +1,5 @@
-#ifndef __VECTOR_3D__
-#define __VECTOR_3D__
+#ifndef __VECTOR_3D_H__
+#define __VECTOR_3D_H__
 
 #ifndef __MATH_H__
 #include <math.h>

@@ -1,9 +1,3 @@
-//*************************************************************************************************************************************//
-//
-//	Original MVC framework made by Mr Toh Da Jun for DM2231 Game Development Techniques
-//	Adapted and modified by Kennard Kee Wei Sheng
-//
-//************************************************************************************************************************************//
 #ifndef __MVC_VIEW_H__
 #include "MVC_View.h"
 #endif
@@ -78,7 +72,7 @@ BOOL MVC_View::Draw(void)
 		basicShape::drawSquare();
 	glPopMatrix();
 
-	m_theModel->thing.draw();
+	m_theModel->thing.Draw();
 
 	glColor3f(1,1,1);
 	SwapBuffers(m_hDC); // Swap Buffers (Double Buffering)

@@ -1,7 +1,7 @@
 #ifndef __AI_HEADER_H__
 #define __AI_HEADER_H__
 
-#ifndef __VECTOR_3D__
+#ifndef __VECTOR_3D_H__
 #include "vector3D.h"
 #endif
 
@@ -26,29 +26,57 @@
 
 enum source
 {
+	NONE=0,
 	SOLDIER,
 	TURRET,
 };
 
-
-class BulletHandle
+class baseObj
 {
 public:
-	typedef struct
-	{
-		int lifeLeft;
-		Vector3D pos,spd;
-		source type;
-	}bullet;//bullet struct
-	static BulletHandle* getInstance();
-	bullet* getBullet(int life,Vector3D pos,Vector3D spd,source type);
-	void update();
-	void draw();
-private:
-	std::vector<bullet*> m_bulletList;
-	static BulletHandle* s_instance();
-	BulletHandle();
-	~BulletHandle();
+	virtual void Update(float delta)=0;
+	virtual void Draw()=0;
+	virtual void SetPos(Vector3D pos);
+	virtual void SetSpd(Vector3D spd);
+	Vector3D GetPos();
+	Vector3D GetSpd();
+	bool GetActive();
+	baseObj();
+	~baseObj();
+protected:
+	bool active;
+	Vector3D pos,spd;
+	Vector3D scale;
 };
+
+class bullet:public baseObj
+{
+public:
+	int lifeLeft;
+	source type;
+	void Update(float delta);
+	void Draw();
+	void Set(int life,Vector3D pos,Vector3D spd,Vector3D scale,source type);
+	bullet();
+	bullet(int life,Vector3D pos,Vector3D spd,source type);
+	~bullet();
+};
+
+class ObjHandle
+{
+public:
+	static ObjHandle* getInstance();
+	bullet* GetBullet(int life,Vector3D pos,Vector3D spd,source type);
+	void Update(float delta);
+	void Draw();
+	static void Drop();
+private:
+	std::vector<baseObj*> m_ObjList;
+	std::vector<bullet*> m_bulletList;
+	static ObjHandle* s_instance;
+	ObjHandle();
+	~ObjHandle();
+};
+
 
 #endif

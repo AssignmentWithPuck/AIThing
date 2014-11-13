@@ -44,9 +44,6 @@
     <ClInclude Include="Mouse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MVCtime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MVC_Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>

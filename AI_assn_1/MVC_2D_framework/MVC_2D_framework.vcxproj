@@ -91,7 +91,6 @@
     <ClInclude Include="MVC_Controller.h" />
     <ClInclude Include="MVC_Model.h" />
     <ClInclude Include="Mouse.h" />
-    <ClInclude Include="MVCtime.h" />
     <ClInclude Include="MVC_View.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

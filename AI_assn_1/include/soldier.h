@@ -1,21 +1,25 @@
 #ifndef __SOLDIER_H__
 #define __SOLDIER_H__
 
-#ifndef __VECTOR_3D__
+#ifndef __AI_HEADER_H__
+#include "AI_header.h"
+#endif
+
+#ifndef __VECTOR_3D_H__
 #include "vector3D.h"
 #endif
 
 
 typedef struct
 {
-	Vector3D pos;
 	int hp;
 	int ammo;
-	int timeRef;
+	int timeRef;//for misc operations
 	bool reloading;
+	int bulletRef;//for reloading and shooting
 }stats;
 
-class SoldierSMControl
+class SoldierSMControl:public baseObj
 {
 public:
 	enum moveSubState
@@ -38,18 +42,19 @@ private:
 	soldierState m_state;
 	moveSubState m_moveState;
 	stats m_stats;
-	void attackState();
-	void moveState();
-	void coverState();
-public:
 	bool m_underFire;
+
+	void AttackState();
+	void MoveState();
+	void CoverState();
+public:
 	SoldierSMControl();
 	~SoldierSMControl();
-	void switchState();//choosing which state to use
-	void update();
-	void draw();//just draw
-	bool underFire();
-	bool isAlive();
+	void SwitchState();//choosing which state to use
+	void Update(float delta);
+	void Draw();//just draw
+	void UnderFire();
+	bool IsAlive();
 };
 
 #endif

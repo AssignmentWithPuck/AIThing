@@ -76,6 +76,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bulletHandle.cpp" />
     <ClCompile Include="Engineer.cpp" />
     <ClCompile Include="mian.cpp" />
     <ClCompile Include="soldier.cpp" />

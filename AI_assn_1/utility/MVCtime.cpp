@@ -126,7 +126,7 @@ int MVCTime::PushNewTime(int limit)
 	return m_timer.size()-1;
 }
 
-bool MVCTime::TestTime(int num,bool reset=true)
+bool MVCTime::TestTime(int num,bool reset)
 {
 	if(m_timer[num]->active)
 	{

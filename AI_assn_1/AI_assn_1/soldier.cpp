@@ -6,6 +6,10 @@
 #include "basicShape.h"
 #endif
 
+#ifndef __MVCTIME_H__
+#include "MVCtime.h"
+#endif
+
 #ifndef __AI_HEADER_H__
 #include "AI_header.h"
 #endif
@@ -19,12 +23,14 @@ using namespace std;
 
 SoldierSMControl::SoldierSMControl()
 {
-	m_stats.pos=Vector3D(100,100,0);
+	pos=Vector3D(100,100,0);
 	m_state=MOVE;
 	m_moveState=MOVEFORWARD;
 	m_stats.ammo=4;
 	m_stats.hp=8;
 	m_stats.reloading=false;
+	m_stats.timeRef=MVCTime::GetInstance()->PushNewTime(2000);
+	m_stats.bulletRef=MVCTime::GetInstance()->PushNewTime(100);
 	m_underFire=false;
 }
 
@@ -33,9 +39,13 @@ SoldierSMControl::~SoldierSMControl()
 
 }
 
-void SoldierSMControl::switchState()
+void SoldierSMControl::SwitchState()
 {
 	//test if timer activates if so then set bool underfire to true
+	if(MVCTime::GetInstance()->TestTime(m_stats.timeRef))
+	{
+		m_underFire=false;
+	}
 	//if(underFire()&&m_state!=COVER&&m_state!=DAMAGE&&m_state!=DEAD)//under fire and not cover or damaged and not dead
 	if(m_underFire&&(m_state!=COVER))
 	{
@@ -47,23 +57,31 @@ void SoldierSMControl::switchState()
 	}
 	if(m_stats.reloading&&m_stats.ammo<4)
 	{
-		cout<<"adding ammo\n";
-		m_stats.ammo++;
+		if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
+		{
+			cout<<"adding ammo\n";
+			m_stats.ammo++;
+		}
 	}
 	else
 	{
 		m_stats.reloading=false;
+		MVCTime::GetInstance()->SetLimit(m_stats.bulletRef,300);
 	}
 	switch(m_state)
 	{
 	case ATTACK:
-		cout<<"shoot\n";
-		m_stats.ammo--;
-		if(m_stats.ammo<=0)
+		if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
 		{
-			m_state=RELOAD;
-			cout<<"out of ammo\n";
-			cout<<"swapped to state reload\n\n";
+			cout<<"shoot\n";
+			m_stats.ammo--;
+			if(m_stats.ammo<=0)
+			{
+				MVCTime::GetInstance()->SetLimit(m_stats.bulletRef,1000);
+				m_state=RELOAD;
+				cout<<"out of ammo\n";
+				cout<<"swapped to state reload\n\n";
+			}
 		}
 		break;
 	case RELOAD:
@@ -86,8 +104,8 @@ void SoldierSMControl::switchState()
 			}
 			else
 			{
-				cout<<"moving forward\n";
-				m_stats.pos.m_y++;
+				//cout<<"moving forward\n";
+				pos.m_y++;
 				//pathing forward
 			}
 			break;
@@ -138,10 +156,9 @@ void SoldierSMControl::switchState()
 		}
 		break;
 	}
-	Sleep(1000);
 }
 
-void SoldierSMControl::update()
+void SoldierSMControl::Update(float delta)
 {
 	switch(m_state)
 	{
@@ -172,14 +189,13 @@ void SoldierSMControl::update()
 	}
 }
 
-bool SoldierSMControl::underFire()
+void SoldierSMControl::UnderFire()
 {
-	//if under fire reset the timer
-	//else if timer expires 
-	return false;
+	m_underFire=true;
+	MVCTime::GetInstance()->ResetTime(m_stats.timeRef);
 }
 
-bool SoldierSMControl::isAlive()
+bool SoldierSMControl::IsAlive()
 {
 	if(m_state==DEAD)
 	{
@@ -189,12 +205,12 @@ bool SoldierSMControl::isAlive()
 		return false;
 }
 
-void SoldierSMControl::draw()
+void SoldierSMControl::Draw()
 {
 	//testing for alive
 	{
 		glPushMatrix();
-			glTranslatef(m_stats.pos.m_x,m_stats.pos.m_y,m_stats.pos.m_z);
+			glTranslatef(pos.m_x,pos.m_y,pos.m_z);
 			glScalef(100,100,0);
 			basicShape::drawSquare();
 		glPopMatrix();
