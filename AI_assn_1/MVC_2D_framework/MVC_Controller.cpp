@@ -180,25 +180,7 @@ void MVC_Controller::ProcKeyboard()
 	bool* temp = m_theView->GetKeyBuffer();
 	if(temp[VK_SPACE])
 	{
-		m_theModel->m_moveX=0;
-		m_theModel->m_moveY=0;
 		m_theModel->thing.UnderFire();
-	}
-	if(temp[ProcKeys('d')])
-	{
-		m_theModel->m_moveX+=10;
-	}
-	if(temp[ProcKeys('a')])
-	{
-		m_theModel->m_moveX-=10;
-	}
-	if(temp[ProcKeys('w')])
-	{
-		m_theModel->m_moveY-=10;
-	}
-	if(temp[ProcKeys('s')])
-	{
-		m_theModel->m_moveY+=10;
 	}
 
 }

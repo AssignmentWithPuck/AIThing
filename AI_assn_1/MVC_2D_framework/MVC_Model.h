@@ -29,11 +29,6 @@ public:
 	float m_worldSizeX;
 	float m_worldSizeY;
 
-	float m_testX;
-	float m_testY;
-	float m_moveX;
-	float m_moveY;
-
 	SoldierSMControl thing;
 
 	MVCTime* m_timer;

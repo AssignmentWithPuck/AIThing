@@ -15,8 +15,9 @@ typedef struct
 	int hp;
 	int ammo;
 	int timeRef;//for misc operations
-	bool reloading;
 	int bulletRef;//for reloading and shooting
+	bool reloading;
+	bool proning;
 }stats;
 
 class SoldierSMControl:public baseObj
@@ -43,6 +44,9 @@ private:
 	moveSubState m_moveState;
 	stats m_stats;
 	bool m_underFire;
+	float m_spdMult;
+
+	void Shoot();
 
 	void AttackState();
 	void MoveState();

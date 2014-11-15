@@ -65,13 +65,8 @@ BOOL MVC_View::Draw(void)
 
 	glColor3f(1,1,1);
 	Printw(5,30,"FPS: %.2f",MVCTime::GetInstance()->GetFPS());
-	glPushMatrix();
-		glColor3f(0,0,1);
-		glTranslatef(m_theModel->m_testX,m_theModel->m_testY,0);
-		glScalef(m_theModel->m_worldSizeX*0.1f,m_theModel->m_worldSizeY*0.1f,0);
-		basicShape::drawSquare();
-	glPopMatrix();
 
+	ObjHandle::GetInstance()->Draw();
 	m_theModel->thing.Draw();
 
 	glColor3f(1,1,1);

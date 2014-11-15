@@ -65,13 +65,13 @@ public:
 class ObjHandle
 {
 public:
-	static ObjHandle* getInstance();
+	static ObjHandle* GetInstance();
 	bullet* GetBullet(int life,Vector3D pos,Vector3D spd,source type);
 	void Update(float delta);
 	void Draw();
 	static void Drop();
 private:
-	std::vector<baseObj*> m_ObjList;
+	std::vector<baseObj*> m_objList;
 	std::vector<bullet*> m_bulletList;
 	static ObjHandle* s_instance;
 	ObjHandle();

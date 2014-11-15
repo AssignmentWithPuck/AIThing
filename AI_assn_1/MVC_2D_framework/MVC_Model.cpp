@@ -18,14 +18,11 @@ MVC_Model::~MVC_Model(void)
 bool MVC_Model::Init(float fpsLimit)
 {
 	m_timer->Init(true,int(fpsLimit));
-	m_moveX=m_moveY=0;
 	return true;
 }
 
 bool MVC_Model::InitPhase2(void)
 {
-	m_testX=m_worldSizeX*0.5f;
-	m_testY=m_worldSizeY*0.5f;
 	return true;
 }
 
@@ -33,12 +30,14 @@ bool MVC_Model::InitPhase2(void)
 void MVC_Model::Update(void)
 {
 	m_timer->UpdateTime();
-	thing.SwitchState();
-	if(m_timer->TestFramerate())
+	if(m_timer->TestFramerate())//update control
 	{
-		m_testX+=m_moveX*m_timer->GetDelta();
-		m_testY+=m_moveY*m_timer->GetDelta();
+		
+		ObjHandle::GetInstance()->Update(m_timer->GetDelta());
+		thing.SwitchState();
+
+
+		thing.Update(m_timer->GetDelta());
 	}
-	thing.Update(m_timer->GetDelta());
 }
 

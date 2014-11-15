@@ -10,6 +10,10 @@
 #include <vector>
 #endif
 
+#ifndef __BASIC_H__
+#include "basicShape.h"
+#endif
+
 
 using namespace std;
 
@@ -50,14 +54,26 @@ baseObj::baseObj()
 
 void bullet::Draw()
 {
-
+	if(active)
+	{
+		glPushMatrix();
+			glTranslatef(pos.m_x,pos.m_y,pos.m_z);
+			glScalef(15,15,0);
+			basicShape::drawSquare();
+		glPopMatrix();
+	}
 }
 
 void bullet::Update(float delta)
 {
 	if(active)
 	{
-		pos+=pos+spd*delta;
+		pos=pos+spd*delta;
+		lifeLeft-=1/delta;
+		if(lifeLeft<=0)
+		{
+			active=false;
+		}
 	}
 }
 
@@ -94,6 +110,7 @@ void bullet::Set(int life,Vector3D pos,Vector3D spd,Vector3D scale,source type)
 
 bullet* ObjHandle::GetBullet(int life,Vector3D pos,Vector3D spd,source type)
 {
+	m_bulletList.size();
 	for(vector<bullet*>::iterator it=m_bulletList.begin();it!=m_bulletList.end();++it)
 	{
 		if(!(*it)->GetActive())
@@ -110,31 +127,32 @@ bullet* ObjHandle::GetBullet(int life,Vector3D pos,Vector3D spd,source type)
 	}
 	bullet*temp=new bullet(life,pos,spd,type);
 	m_bulletList.push_back(temp);
-	m_ObjList.push_back(temp);
+	m_objList.push_back(temp);
 	return temp;
 }
 
 void ObjHandle::Update(float delta)
 {
-	for(vector<bullet*>::iterator it=m_bulletList.begin();it!=m_bulletList.end();++it)
+	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
 	{
-		
+		(*it)->Update(delta);
 	}
 }
 
 void ObjHandle::Draw(void)
 {
-	for(vector<bullet*>::iterator it=m_bulletList.begin();it!=m_bulletList.end();++it)
+	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
 	{
 		//draw here;
+		(*it)->Draw();
 	}
 }
 
 ObjHandle* ObjHandle::s_instance=NULL;
 
-ObjHandle* ObjHandle::getInstance()
+ObjHandle* ObjHandle::GetInstance()
 {
-	if(s_instance=NULL)
+	if(s_instance==NULL)
 	{
 		s_instance=new ObjHandle;
 	}
@@ -145,10 +163,10 @@ void ObjHandle::Drop()
 {
 	if(s_instance!=NULL)
 	{
-		while(s_instance->m_ObjList.size()>0)
+		while(s_instance->m_objList.size()>0)
 		{
-			delete (s_instance->m_ObjList.back());
-			s_instance->m_ObjList.pop_back();
+			delete (s_instance->m_objList.back());
+			s_instance->m_objList.pop_back();
 		}
 		delete s_instance;
 		s_instance=NULL;
