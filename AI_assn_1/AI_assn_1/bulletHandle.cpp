@@ -182,3 +182,9 @@ ObjHandle::ObjHandle()
 {
 
 }
+
+vector<Vector3D*> ObjHandle::FindPath(baseObj* start,Vector3D end)
+{
+	vector<Vector3D*> something;
+	return something;
+}

@@ -31,6 +31,12 @@ enum source
 	TURRET,
 };
 
+struct node
+{
+	Vector3D pos;
+	std::vector<node*> neighbour;
+};
+
 class baseObj
 {
 public:
@@ -69,6 +75,9 @@ public:
 	bullet* GetBullet(int life,Vector3D pos,Vector3D spd,source type);
 	void Update(float delta);
 	void Draw();
+	std::vector<Vector3D*> FindPath(baseObj* start,Vector3D end);
+	std::vector<Vector3D*> FindPath(baseObj* start,baseObj* end);
+	std::vector<Vector3D*> FindPath(Vector3D start,Vector3D end);
 	static void Drop();
 private:
 	std::vector<baseObj*> m_objList;

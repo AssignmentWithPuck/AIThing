@@ -24,6 +24,7 @@ using namespace std;
 SoldierSMControl::SoldierSMControl()
 {
 	pos=Vector3D(100,100,0);
+	scale=Vector3D(50,50,50);
 	m_state=MOVE;
 	m_moveState=MOVEFORWARD;
 	m_stats.ammo=4;
@@ -105,12 +106,6 @@ void SoldierSMControl::SwitchState()
 					cout<<"have ammo\n";
 					cout<<"	swapped to substate move to shoot\n\n";
 				}
-				else
-				{
-					//cout<<"moving forward\n";
-					pos+=spd*m_spdMult;
-					//pathing forward
-				}
 				break;
 			case MOVETOSHOOT:
 				//if statement to check is there is a clear shot
@@ -152,6 +147,7 @@ void SoldierSMControl::SwitchState()
 			{
 				m_state=MOVE;
 				m_moveState=MOVETOCOVER;
+				UnderFire();
 			}
 			else
 			{
@@ -209,12 +205,12 @@ void SoldierSMControl::Update(float delta)
 			//path finding to nearest cover;
 			break;
 		case MOVEFORWARD:
+			pos+=spd*m_spdMult;
 			//pathfinding to enemy base;
 			break;
 		}
 		break;
 	case ATTACK:
-		
 		if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
 		{
 			cout<<"shoot\n";
@@ -264,5 +260,4 @@ void SoldierSMControl::Draw()
 			basicShape::drawSquare();
 		glPopMatrix();
 	}
-
 }
