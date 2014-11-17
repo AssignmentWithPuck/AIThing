@@ -1,6 +1,7 @@
 #pragma once
 #include "vector3D.h"
-class CTurret
+#include "AI_header.h"
+class CTurret : public baseObj
 {
 public:
 	enum turretState
@@ -13,10 +14,10 @@ public:
 
 typedef struct
 {
-	Vector3D pos;
 	int hp;
 	int ammo;
 	int timeRef;
+	int bulletRef;
 }stats;
 
 private:
@@ -24,12 +25,13 @@ private:
 	stats m_stats;
 	void attackState();
 	void reloadState();
+	void Shoot();
 public:
 	CTurret(void);
 	~CTurret(void);
-	void switchState();
-	void update();
-	void draw();
+	void SwitchState();
+	void Update(float delta);
+	void Draw();
 	bool isDamaged();
 	bool isAlive();
 	bool reqRepair;

@@ -41,10 +41,10 @@
     <ClInclude Include="..\include\vector3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Turret.h">
+    <ClInclude Include="..\include\Engineer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engineer.h">
+    <ClInclude Include="..\include\Turret.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
