@@ -1,6 +1,7 @@
 #pragma once
 #include "vector3D.h"
-class CEngineer
+#include "AI_header.h"
+class CEngineer : public baseObj
 {
 public:
 	enum moveSubState
@@ -21,7 +22,6 @@ public:
 
 typedef struct
 {
-	Vector3D pos;
 	int hp;
 	int charge;
 	int timeRef;

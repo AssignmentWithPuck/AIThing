@@ -14,6 +14,9 @@
 #include "soldier.h"
 #endif
 
+#include "Engineer.h"
+#include "Turret.h"
+
 class MVCTime;
 
 class MVC_Model
@@ -30,6 +33,8 @@ public:
 	float m_worldSizeY;
 
 	SoldierSMControl thing;
+
+	CTurret thing2;
 
 	MVCTime* m_timer;
 private: 

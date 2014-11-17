@@ -84,10 +84,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\AI_header.h" />
+    <ClInclude Include="..\include\Engineer.h" />
     <ClInclude Include="..\include\soldier.h" />
+    <ClInclude Include="..\include\Turret.h" />
     <ClInclude Include="..\include\vector3D.h" />
-    <ClInclude Include="Engineer.h" />
-    <ClInclude Include="Turret.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

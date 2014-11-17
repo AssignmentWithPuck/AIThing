@@ -68,6 +68,7 @@ BOOL MVC_View::Draw(void)
 
 	ObjHandle::GetInstance()->Draw();
 	m_theModel->thing.Draw();
+	m_theModel->thing2.Draw();
 
 	glColor3f(1,1,1);
 	SwapBuffers(m_hDC); // Swap Buffers (Double Buffering)
