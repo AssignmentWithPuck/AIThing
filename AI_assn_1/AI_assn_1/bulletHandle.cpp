@@ -14,6 +14,10 @@
 #include "basicShape.h"
 #endif
 
+#ifndef __SOLDIER_H__
+#include "soldier.h"
+#endif
+
 
 using namespace std;
 
@@ -49,7 +53,6 @@ baseObj::~baseObj()
 
 baseObj::baseObj()
 {
-
 }
 
 void bullet::Draw()
@@ -96,6 +99,7 @@ bullet::bullet(int life,Vector3D pos,Vector3D spd,source type)
 	this->spd=spd;
 	this->type=type;
 	this->active=true;
+
 }
 
 void bullet::Set(int life,Vector3D pos,Vector3D spd,Vector3D scale,source type)
@@ -127,25 +131,73 @@ bullet* ObjHandle::GetBullet(int life,Vector3D pos,Vector3D spd,source type)
 	}
 	bullet*temp=new bullet(life,pos,spd,type);
 	m_bulletList.push_back(temp);
-	m_objList.push_back(temp);
+	if(accessing)
+	{
+		addedStuff=true;
+		m_backLog.push_back(temp);
+	}
+	else
+		m_objList.push_back(temp);
 	return temp;
+}
+
+void ObjHandle::PushObj(objType type,Vector3D pos)
+{
+	switch(type)
+	{
+	case SOLDIER_TYPE:
+		{
+			SoldierSMControl* temp=new SoldierSMControl;
+			temp->SetPos(pos);
+			if(accessing)
+			{
+				addedStuff=true;
+				m_backLog.push_back(temp);
+			}
+			else
+				m_objList.push_back(temp);
+		}
+		break;
+	case ENGINEER_TYPE:
+		
+		break;
+	case TURRET_TYPE:
+
+		break;
+	}
 }
 
 void ObjHandle::Update(float delta)
 {
+	accessing=true;
 	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
 	{
 		(*it)->Update(delta);
+	}
+	accessing=false;
+	if(addedStuff)
+	{
+		for(vector<baseObj*>::iterator it=m_backLog.begin();it!=m_backLog.end();++it)
+		{
+			m_objList.push_back(*it);
+		}
+		while(m_backLog.size()>0)
+		{
+			m_backLog.pop_back();
+		}
+		addedStuff=false;
 	}
 }
 
 void ObjHandle::Draw(void)
 {
+	accessing =true;
 	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
 	{
 		//draw here;
 		(*it)->Draw();
 	}
+	accessing =false;
 }
 
 ObjHandle* ObjHandle::s_instance=NULL;
@@ -180,11 +232,32 @@ ObjHandle::~ObjHandle()
 
 ObjHandle::ObjHandle()
 {
-
+	addedStuff=false;
+	accessing=false;
 }
 
 vector<Vector3D*> ObjHandle::FindPath(baseObj* start,Vector3D end)
 {
 	vector<Vector3D*> something;
 	return something;
+}
+
+int ObjHandle::BulletsInProx(source src,Vector3D pos,float dist)
+{
+	int counter=0;
+	for(vector<bullet*>::iterator it=m_bulletList.begin();it!=m_bulletList.end();++it)
+	{
+		bullet* temp= *it;
+		if(temp->GetActive())
+		{
+			if(temp->type==src)
+			{
+				if((pos-temp->GetPos()).GetMagnitudeSquare()<dist*dist)
+				{
+					counter++;
+				}
+			}
+		}
+	}
+	return counter;
 }

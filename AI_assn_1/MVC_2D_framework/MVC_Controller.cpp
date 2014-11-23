@@ -180,7 +180,7 @@ void MVC_Controller::ProcKeyboard()
 	bool* temp = m_theView->GetKeyBuffer();
 	if(temp[VK_SPACE])
 	{
-		m_theModel->thing.UnderFire();
+		//m_theModel->thing.UnderFire();
 	}
 
 }

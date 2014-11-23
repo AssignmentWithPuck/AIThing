@@ -9,6 +9,10 @@
 #include "vector3D.h"
 #endif
 
+#ifndef __QUEUE_H__
+#include <queue>
+#endif
+
 
 typedef struct
 {
@@ -46,7 +50,12 @@ private:
 	bool m_underFire;
 	float m_spdMult;
 
+	int underFireLimit;
+
 	void Shoot();
+
+	std::queue<Vector3D> m_nearestCover;
+	std::queue<Vector3D> m_nearestEnemy;
 
 	void AttackState();
 	void MoveState();
@@ -57,7 +66,7 @@ public:
 	void SwitchState();//choosing which state to use
 	void Update(float delta);
 	void Draw();//just draw
-	void UnderFire();
+	void UnderFire(float priority);
 	bool IsAlive();
 };
 

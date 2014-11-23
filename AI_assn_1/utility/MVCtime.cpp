@@ -72,14 +72,6 @@ MVCTime::~MVCTime()
 
 }
 
-MVCTime::MVCTime()
-{
-	m_frameCount=m_timeInterval=m_dtInterval=0;
-	m_dt=0.f;
-	m_previousTime=m_currentTime=m_dtPTime=timeGetTime();
-	m_fps=0.0f;
-}
-
 void MVCTime::Init(bool limitFPS=false,int limit=0)
 {
 	m_frameCount=0;
@@ -87,6 +79,15 @@ void MVCTime::Init(bool limitFPS=false,int limit=0)
 	m_fps=0.0f;
 	m_limitFPS=limitFPS;
 	m_fpsLimit=float(1000.f/limit);
+}
+
+MVCTime::MVCTime()
+{
+	m_frameCount=m_timeInterval=m_dtInterval=0;
+	m_dt=0.f;
+	m_previousTime=m_currentTime=m_dtPTime=timeGetTime();
+	m_fps=0.0f;
+	Init();
 }
 
 float MVCTime::GetDelta(void)

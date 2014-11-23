@@ -28,7 +28,14 @@ enum source
 {
 	NONE=0,
 	SOLDIER,
-	TURRET,
+	TURRET
+};
+
+enum objType
+{
+	SOLDIER_TYPE,
+	TURRET_TYPE,
+	ENGINEER_TYPE
 };
 
 struct node
@@ -74,13 +81,18 @@ public:
 	static ObjHandle* GetInstance();
 	bullet* GetBullet(int life,Vector3D pos,Vector3D spd,source type);
 	void Update(float delta);
+	void PushObj(objType type,Vector3D pos);
+	int BulletsInProx(source src,Vector3D pos,float dist);
 	void Draw();
 	std::vector<Vector3D*> FindPath(baseObj* start,Vector3D end);
 	std::vector<Vector3D*> FindPath(baseObj* start,baseObj* end);
 	std::vector<Vector3D*> FindPath(Vector3D start,Vector3D end);
 	static void Drop();
 private:
+	bool addedStuff;
+	bool accessing;
 	std::vector<baseObj*> m_objList;
+	std::vector<baseObj*> m_backLog;
 	std::vector<bullet*> m_bulletList;
 	static ObjHandle* s_instance;
 	ObjHandle();

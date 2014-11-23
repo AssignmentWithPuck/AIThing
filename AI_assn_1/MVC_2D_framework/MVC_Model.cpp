@@ -18,6 +18,7 @@ MVC_Model::~MVC_Model(void)
 bool MVC_Model::Init(float fpsLimit)
 {
 	m_timer->Init(true,int(fpsLimit));
+	ObjHandle::GetInstance()->PushObj(SOLDIER_TYPE,Vector3D(100,100,0));
 	return true;
 }
 
@@ -34,10 +35,10 @@ void MVC_Model::Update(void)
 	{
 		
 		ObjHandle::GetInstance()->Update(m_timer->GetDelta());
-		thing.SwitchState();
+		//thing.SwitchState();
 		thing2.SwitchState();
 
-		thing.Update(m_timer->GetDelta());
+		//thing.Update(m_timer->GetDelta());
 		thing2.Update(m_timer->GetDelta());
 	}
 }

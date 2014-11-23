@@ -67,7 +67,7 @@ BOOL MVC_View::Draw(void)
 	Printw(5,30,"FPS: %.2f",MVCTime::GetInstance()->GetFPS());
 
 	ObjHandle::GetInstance()->Draw();
-	m_theModel->thing.Draw();
+	//m_theModel->thing.Draw();
 	m_theModel->thing2.Draw();
 
 	glColor3f(1,1,1);

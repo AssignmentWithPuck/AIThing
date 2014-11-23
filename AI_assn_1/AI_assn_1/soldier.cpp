@@ -32,6 +32,7 @@ SoldierSMControl::SoldierSMControl()
 	m_stats.reloading=false;
 	m_stats.timeRef=MVCTime::GetInstance()->PushNewTime(2000);
 	m_stats.bulletRef=MVCTime::GetInstance()->PushNewTime(100);
+	underFireLimit=MVCTime::GetInstance()->PushNewTime(200);
 	m_stats.proning=false;
 	m_underFire=false;
 	m_spdMult=1.0;
@@ -40,30 +41,18 @@ SoldierSMControl::SoldierSMControl()
 
 SoldierSMControl::~SoldierSMControl()
 {
-
 }
 
 void SoldierSMControl::SwitchState()
 {
 	if(IsAlive())
 	{
-		//test if timer activates if so then set bool underfire to true
-		if(MVCTime::GetInstance()->TestTime(m_stats.timeRef))
+		if(MVCTime::GetInstance()->TestTime(underFireLimit))
 		{
-			m_underFire=false;
-			m_stats.proning=false;
-			m_spdMult=1.0;
+			int i=ObjHandle::GetInstance()->BulletsInProx(TURRET,pos,100.0f);
+			UnderFire(i);
 		}
-		if(m_underFire&&(m_state!=COVER))//under fire and not cover or damaged
-		{
-			cout<<"under fire\n";
-			cout<<"swapped to state move\n";
-			cout<<"	swapped to substate move to cover\n\n";
-			m_moveState=MOVETOCOVER;
-			m_state=MOVE;
-			m_stats.proning=true;
-			m_spdMult=0.5;
-		}
+
 		if(m_stats.reloading&&m_stats.ammo<4)
 		{
 			if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
@@ -114,10 +103,6 @@ void SoldierSMControl::SwitchState()
 				m_state=ATTACK;
 				break;
 			case MOVETOCOVER:
-				//if statement to check if in cover;
-				cout<<"in cover\n";
-				cout<<"swapped to state cover\n\n";
-				m_state=COVER;
 				break;
 			}
 			break;
@@ -145,9 +130,9 @@ void SoldierSMControl::SwitchState()
 			m_stats.hp-=1;
 			if(m_stats.hp>0)
 			{
-				m_state=MOVE;
-				m_moveState=MOVETOCOVER;
-				UnderFire();
+				//m_state=MOVE;
+				//m_moveState=MOVETOCOVER;
+				UnderFire(rand()%2+3);
 			}
 			else
 			{
@@ -190,6 +175,7 @@ void SoldierSMControl::Shoot()
 
 void SoldierSMControl::Update(float delta)
 {
+	SwitchState();
 	switch(m_state)
 	{
 	case COVER:
@@ -203,7 +189,7 @@ void SoldierSMControl::Update(float delta)
 			break;
 		case MOVETOCOVER:
 			//path finding to nearest cover;
-			break;
+			//no break cause i wan it to do the same as moveforward
 		case MOVEFORWARD:
 			pos+=spd*m_spdMult;
 			//pathfinding to enemy base;
@@ -226,10 +212,68 @@ void SoldierSMControl::Update(float delta)
 	}
 }
 
-void SoldierSMControl::UnderFire()
+//priority ~ number of bullets nearby
+void SoldierSMControl::UnderFire(float priority)//state changer
 {
-	m_underFire=true;
-	MVCTime::GetInstance()->ResetTime(m_stats.timeRef);
+	if(m_state==COVER)
+	{
+		//test if timer activates if so then set bool underfire to false
+		if(MVCTime::GetInstance()->TestTime(m_stats.timeRef))
+		{
+			m_underFire=false;
+			m_stats.proning=false;
+			m_spdMult=1.0;
+		}
+		
+	}
+	else if(m_moveState==MOVETOCOVER&&m_state==MOVE)
+	{
+		if(MVCTime::GetInstance()->TestTime(m_stats.timeRef))
+		{
+			m_underFire=true;
+			m_stats.proning=true;
+			int i=rand()%1000+1000+priority*300;//rand number between 1s-2s + priority*0.3s
+			if(i<0)
+			{
+				i=1;
+			}
+			m_state=COVER;
+			MVCTime::GetInstance()->SetLimit(m_stats.timeRef,i);
+			MVCTime::GetInstance()->ResetTime(m_stats.timeRef);
+			//set limit and reset timer here
+		}
+		//test for timer and then if true change state to cover
+	}
+	else
+	{
+		if(priority>0)
+		{
+			cout<<"under fire\n";
+		}
+		int i=rand()%5;
+		if(i<priority)
+		{
+		//test for going under cover condition~number of bullets in proximity
+		//if success then move to cover else carry on
+			i=rand()%500+500-priority*300;//rand number between 1s-2s - priority*0.3s
+			if(i<0)
+			{
+				i=1;
+			}
+			cout<<"swapped to state move\n";
+			cout<<"	swapped to substate move to cover\n\n";
+			m_spdMult=0.5;
+			m_moveState=MOVETOCOVER;
+			m_state=MOVE;
+			MVCTime::GetInstance()->SetLimit(m_stats.timeRef,i);
+			MVCTime::GetInstance()->ResetTime(m_stats.timeRef);
+		}
+		else
+		{
+			if(priority>0)
+				cout<<"ignore enemy fire\n";
+		}
+	}
 }
 
 bool SoldierSMControl::IsAlive()

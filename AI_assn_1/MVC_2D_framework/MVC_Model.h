@@ -32,7 +32,7 @@ public:
 	float m_worldSizeX;
 	float m_worldSizeY;
 
-	SoldierSMControl thing;
+	//SoldierSMControl thing;
 
 	CTurret thing2;
 
