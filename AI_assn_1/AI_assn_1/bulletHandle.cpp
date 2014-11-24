@@ -149,6 +149,7 @@ void ObjHandle::PushObj(objType type,Vector3D pos)
 		{
 			SoldierSMControl* temp=new SoldierSMControl;
 			temp->SetPos(pos);
+			m_AIList.push_back(temp);
 			if(accessing)
 			{
 				addedStuff=true;
@@ -159,10 +160,10 @@ void ObjHandle::PushObj(objType type,Vector3D pos)
 		}
 		break;
 	case ENGINEER_TYPE:
-		
+		//for fuad to do	
 		break;
 	case TURRET_TYPE:
-
+		//for fuad to do	
 		break;
 	}
 }
@@ -191,7 +192,7 @@ void ObjHandle::Update(float delta)
 
 void ObjHandle::Draw(void)
 {
-	accessing =true;
+	accessing=true;
 	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
 	{
 		//draw here;
@@ -236,11 +237,6 @@ ObjHandle::ObjHandle()
 	accessing=false;
 }
 
-vector<Vector3D*> ObjHandle::FindPath(baseObj* start,Vector3D end)
-{
-	vector<Vector3D*> something;
-	return something;
-}
 
 int ObjHandle::BulletsInProx(source src,Vector3D pos,float dist)
 {

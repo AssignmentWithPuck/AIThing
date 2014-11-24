@@ -62,7 +62,6 @@ BOOL MVC_View::Draw(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
 	glLoadIdentity(); // ReSet The Current Modelview Matrix
 	glEnable(GL_TEXTURE_2D);
-
 	glColor3f(1,1,1);
 	Printw(5,30,"FPS: %.2f",MVCTime::GetInstance()->GetFPS());
 
@@ -70,6 +69,7 @@ BOOL MVC_View::Draw(void)
 	//m_theModel->thing.Draw();
 	m_theModel->thing2.Draw();
 
+	glDisable(GL_TEXTURE_2D);
 	glColor3f(1,1,1);
 	SwapBuffers(m_hDC); // Swap Buffers (Double Buffering)
 

@@ -18,12 +18,13 @@ MVC_Model::~MVC_Model(void)
 bool MVC_Model::Init(float fpsLimit)
 {
 	m_timer->Init(true,int(fpsLimit));
-	ObjHandle::GetInstance()->PushObj(SOLDIER_TYPE,Vector3D(100,100,0));
 	return true;
 }
 
 bool MVC_Model::InitPhase2(void)
 {
+	ObjHandle::GetInstance()->PushObj(SOLDIER_TYPE,Vector3D(100,100,0));
+	
 	return true;
 }
 

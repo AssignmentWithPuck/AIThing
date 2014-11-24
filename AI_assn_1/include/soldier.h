@@ -1,6 +1,10 @@
 #ifndef __SOLDIER_H__
 #define __SOLDIER_H__
 
+#ifndef __TEXTURE_H__
+#include "texture.h"
+#endif
+
 #ifndef __AI_HEADER_H__
 #include "AI_header.h"
 #endif
@@ -51,6 +55,7 @@ private:
 	float m_spdMult;
 
 	int underFireLimit;
+	
 
 	void Shoot();
 
@@ -61,6 +66,7 @@ private:
 	void MoveState();
 	void CoverState();
 public:
+	TextureImage soldierTex;
 	SoldierSMControl();
 	~SoldierSMControl();
 	void SwitchState();//choosing which state to use

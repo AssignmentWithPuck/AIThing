@@ -37,6 +37,10 @@ SoldierSMControl::SoldierSMControl()
 	m_underFire=false;
 	m_spdMult=1.0;
 	spd=Vector3D(0,1.0,0);
+	if(!LoadTGA(&soldierTex,"soldier.tga"))
+	{
+		cout<<"error loading textures\n";
+	}
 }
 
 SoldierSMControl::~SoldierSMControl()
@@ -298,10 +302,20 @@ void SoldierSMControl::Draw()
 		{
 			glColor3f(1.0,1.0,1.0);
 		}
-		glPushMatrix();
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		glBindTexture(GL_TEXTURE_2D,soldierTex.texID);
+
+		glPushMatrix(); 
+			glRotatef(atan(spd.m_x/spd.m_y)/3.142*180,0,0,1);
 			glTranslatef(pos.m_x,pos.m_y,pos.m_z);
 			glScalef(50,50,0);
 			basicShape::drawSquare();
 		glPopMatrix();
+
+		glDisable(GL_BLEND);
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1,1,1);
 	}
 }
