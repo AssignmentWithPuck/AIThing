@@ -17,6 +17,7 @@ public:
 	IDLE = 0,
 	REPAIR,
 	RECHARGE,
+	DAMAGED,
 	DEAD,
 };
 
@@ -37,9 +38,9 @@ private:
 public:
 	CEngineer(void);
 	~CEngineer(void);
-	void switchState();
-	void update();
-	void draw();
+	void SwitchState();
+	void Update(float delta);
+	void Draw();
 	bool isAlive();
 
 };

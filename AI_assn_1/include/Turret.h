@@ -22,11 +22,12 @@ typedef struct
 
 private:
 	turretState m_state;
-	stats m_stats;
+	
 	void attackState();
 	void reloadState();
 	void Shoot();
 public:
+	stats m_stats;
 	CTurret(void);
 	~CTurret(void);
 	void SwitchState();

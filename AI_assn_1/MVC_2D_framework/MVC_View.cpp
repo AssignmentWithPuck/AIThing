@@ -68,6 +68,7 @@ BOOL MVC_View::Draw(void)
 	ObjHandle::GetInstance()->Draw();
 	//m_theModel->thing.Draw();
 	m_theModel->thing2.Draw();
+	m_theModel->eng.Draw();
 
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1,1,1);

@@ -36,6 +36,8 @@ public:
 
 	CTurret thing2;
 
+	CEngineer eng;
+
 	MVCTime* m_timer;
 private: 
 };

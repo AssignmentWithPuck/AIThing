@@ -38,9 +38,11 @@ void MVC_Model::Update(void)
 		ObjHandle::GetInstance()->Update(m_timer->GetDelta());
 		//thing.SwitchState();
 		thing2.SwitchState();
+		eng.SwitchState();
 
 		//thing.Update(m_timer->GetDelta());
 		thing2.Update(m_timer->GetDelta());
+		eng.Update(m_timer->GetDelta());
 	}
 }
 
