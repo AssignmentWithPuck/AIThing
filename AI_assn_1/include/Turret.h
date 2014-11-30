@@ -1,6 +1,7 @@
 #pragma once
 #include "vector3D.h"
 #include "AI_header.h"
+#include  "texture.h"
 class CTurret : public baseObj
 {
 public:
@@ -21,17 +22,20 @@ typedef struct
 }stats;
 
 private:
-	turretState m_state;
-	
+	Vector3D atkDir;
 	void attackState();
 	void reloadState();
 	void Shoot();
+	baseObj* atkTarget;
 public:
+	turretState m_state;
+	TextureImage turretTex;
 	stats m_stats;
 	CTurret(void);
 	~CTurret(void);
 	void SwitchState();
 	void Update(float delta);
+	void bulletHit(bullet* bul);
 	void Draw();
 	bool isDamaged();
 	bool isAlive();

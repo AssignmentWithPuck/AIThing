@@ -15,6 +15,12 @@
 
 #ifndef __QUEUE_H__
 #include <queue>
+#define __QUEUE_H__
+#endif
+
+#ifndef __DEQUE_H__
+#include <deque>
+#define __DEQUE_H__
 #endif
 
 
@@ -48,9 +54,6 @@ public:
 		DEAD,
 	};
 private:
-	soldierState m_state;
-	moveSubState m_moveState;
-	stats m_stats;
 	bool m_underFire;
 	float m_spdMult;
 
@@ -61,11 +64,14 @@ private:
 
 	std::queue<Vector3D> m_nearestCover;
 	std::queue<Vector3D> m_nearestEnemy;
-
-	void AttackState();
-	void MoveState();
-	void CoverState();
+	
+	std::deque<bullet*> m_dodgeList;
+	baseObj* atkTarget;
 public:
+	stats m_stats;
+	soldierState m_state;
+	moveSubState m_moveState;
+	bool init();
 	TextureImage soldierTex;
 	SoldierSMControl();
 	~SoldierSMControl();
@@ -73,6 +79,7 @@ public:
 	void Update(float delta);
 	void Draw();//just draw
 	void UnderFire(float priority);
+	void bulletHit(bullet* bul);
 	bool IsAlive();
 };
 

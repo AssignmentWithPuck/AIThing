@@ -54,8 +54,10 @@ public:
 	Vector3D GetPos();
 	Vector3D GetSpd();
 	bool GetActive();
+	void SetActive(bool nActive);
 	baseObj();
 	~baseObj();
+	objType m_objType;
 protected:
 	bool active;
 	Vector3D pos,spd;
@@ -85,11 +87,11 @@ public:
 	int BulletsInProx(source src,Vector3D pos,float dist);
 	void Draw();
 	static void Drop();
+	std::vector<baseObj*> m_AIList;
 private:
 	bool addedStuff;
 	bool accessing;
 	std::vector<baseObj*> m_objList;
-	std::vector<baseObj*> m_AIList;
 	std::vector<baseObj*> m_backLog;
 	std::vector<bullet*> m_bulletList;
 	static ObjHandle* s_instance;

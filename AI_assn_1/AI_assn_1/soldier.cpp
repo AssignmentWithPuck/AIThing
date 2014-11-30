@@ -23,21 +23,23 @@ using namespace std;
 
 SoldierSMControl::SoldierSMControl()
 {
+	m_objType=SOLDIER_TYPE;
 	pos=Vector3D(100,100,0);
 	scale=Vector3D(50,50,50);
 	m_state=MOVE;
 	m_moveState=MOVEFORWARD;
-	m_stats.ammo=4;
-	m_stats.hp=8;
+	m_stats.ammo=7;
+	m_stats.hp=10;
 	m_stats.reloading=false;
 	m_stats.timeRef=MVCTime::GetInstance()->PushNewTime(2000);
 	m_stats.bulletRef=MVCTime::GetInstance()->PushNewTime(100);
 	underFireLimit=MVCTime::GetInstance()->PushNewTime(200);
 	m_stats.proning=false;
 	m_underFire=false;
+	atkTarget=NULL;
 	m_spdMult=1.0;
 	spd=Vector3D(0,1.0,0);
-	if(!LoadTGA(&soldierTex,"soldier.tga"))
+	if(!LoadTGA(&soldierTex,"Soldier.tga"))
 	{
 		cout<<"error loading textures\n";
 	}
@@ -57,11 +59,10 @@ void SoldierSMControl::SwitchState()
 			UnderFire(i);
 		}
 
-		if(m_stats.reloading&&m_stats.ammo<4)
+		if(m_stats.reloading&&m_stats.ammo<7)
 		{
 			if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
 			{
-				cout<<"adding ammo\n";
 				m_stats.ammo++;
 			}
 		}
@@ -77,17 +78,12 @@ void SoldierSMControl::SwitchState()
 				{
 					MVCTime::GetInstance()->SetLimit(m_stats.bulletRef,1000);
 					m_state=RELOAD;
-					cout<<"out of ammo\n";
-					cout<<"swapped to state reload\n\n";
 				}
 			break;
 		case RELOAD:
 			m_state=MOVE;
 			m_moveState=MOVEFORWARD;
 			m_stats.reloading=true;
-			cout<<"reloading\n";
-			cout<<"swapped to state move\n";
-			cout<<"	swapped to substate move forward\n\n";
 			break;
 		case MOVE:
 			switch(m_moveState)
@@ -96,15 +92,33 @@ void SoldierSMControl::SwitchState()
 				if(!m_stats.reloading)
 				{
 					m_moveState=MOVETOSHOOT;
-					cout<<"have ammo\n";
-					cout<<"	swapped to substate move to shoot\n\n";
 				}
 				break;
 			case MOVETOSHOOT:
-				//if statement to check is there is a clear shot
-				cout<<"clear shot of enemy\n";
-				cout<<"swapped to state attack\n\n";
 				m_state=ATTACK;
+				for(vector<baseObj*>::iterator it=ObjHandle::GetInstance()->m_AIList.begin();it!=ObjHandle::GetInstance()->m_AIList.end();++it)
+				{
+					if((*it)->m_objType!=SOLDIER_TYPE)
+					{
+						if((*it)->GetActive())
+						{
+							baseObj* temp=(*it);
+							if(atkTarget!=NULL&&atkTarget->GetActive())
+							{
+								Vector3D tPos=atkTarget->GetPos()-pos;
+								Vector3D nPos=temp->GetPos()-pos;
+								if(tPos.GetMagnitudeSquare()>nPos.GetMagnitudeSquare())
+								{
+									atkTarget=temp;
+								}
+							}
+							else
+							{
+								atkTarget=temp;
+							}
+						}
+					}
+				}
 				break;
 			case MOVETOCOVER:
 				break;
@@ -113,19 +127,13 @@ void SoldierSMControl::SwitchState()
 		case COVER:
 			if(!m_underFire)
 			{
-				cout<<"no longer under fire\n";
 				if(m_stats.ammo>0)
 				{
-					cout<<"have ammo\n";
-					cout<<"swapped to state move\n";
-					cout<<"	swapped to substate move to shoot\n\n";
 					m_state=MOVE;
 					m_moveState=MOVETOSHOOT;
 				}
 				else
 				{
-					cout<<"no ammo\n";
-					cout<<"swapped to state reload\n\n";
 					m_state=RELOAD;
 				}
 			}
@@ -136,11 +144,13 @@ void SoldierSMControl::SwitchState()
 			{
 				//m_state=MOVE;
 				//m_moveState=MOVETOCOVER;
-				UnderFire(rand()%2+3);
+				m_state=MOVE;
+				UnderFire(rand()%8+7);
 			}
 			else
 			{
 				m_state=DEAD;
+				active=false;
 			}
 			break;
 		}
@@ -152,7 +162,14 @@ void SoldierSMControl::Shoot()
 	if(IsAlive())
 	{
 		Vector3D aim;
-		aim=spd;
+		if(atkTarget!=NULL)
+		{
+			aim=atkTarget->GetPos()-pos;
+		}
+		else
+		{
+			aim=spd;
+		}
 		aim.NormalizeVector3D();
 		float recoil =rand()%50-25;
 		recoil=recoil/180*3.142;
@@ -173,13 +190,25 @@ void SoldierSMControl::Shoot()
 		aim=(side+aim);
 		aim.NormalizeVector3D();
 		aim=aim*300;
-		ObjHandle::GetInstance()->GetBullet(rand()%1000+500,pos,aim,SOLDIER);
+		ObjHandle::GetInstance()->GetBullet(rand()%1000+1000,pos,aim,SOLDIER);
 	}
 }
 
 void SoldierSMControl::Update(float delta)
 {
+	//there are stuff inside and the front is not active
+	//working with assumtion that the stuff infront is older and so will be more likely to expire first
+	if(atkTarget!=NULL)
+	{
+		spd=atkTarget->GetPos()-pos;
+		spd.NormalizeVector3D();
+	}
+	while(m_dodgeList.size()>0&&!m_dodgeList.front()->GetActive())
+	{
+		m_dodgeList.pop_front();
+	}
 	SwitchState();
+	
 	switch(m_state)
 	{
 	case COVER:
@@ -188,14 +217,10 @@ void SoldierSMControl::Update(float delta)
 	case MOVE:
 		switch(m_moveState)
 		{
-		case MOVETOSHOOT:
-			//path finding to area that can shoot;
-			break;
-		case MOVETOCOVER:
-			//path finding to nearest cover;
-			//no break cause i wan it to do the same as moveforward
 		case MOVEFORWARD:
-			pos+=spd*m_spdMult;
+			spd=(atkTarget->GetPos()-pos);
+			spd.NormalizeVector3D();
+			pos+=spd*m_spdMult*0.5;
 			//pathfinding to enemy base;
 			break;
 		}
@@ -203,7 +228,6 @@ void SoldierSMControl::Update(float delta)
 	case ATTACK:
 		if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
 		{
-			cout<<"shoot\n";
 			m_stats.ammo--;
 			Shoot();
 		}
@@ -236,11 +260,10 @@ void SoldierSMControl::UnderFire(float priority)//state changer
 		{
 			m_underFire=true;
 			m_stats.proning=true;
-			int i=rand()%1000+1000+priority*300;//rand number between 1s-2s + priority*0.3s
-			if(i<0)
-			{
-				i=1;
-			}
+			//rand number between 1s-2s + priority*0.15s( time taken to get back up )
+			//reasoning if u are under heavy fire u will be scared and will take longer to be willing to
+			//go back into battle
+			int i=rand()%1000+1000+priority*150;
 			m_state=COVER;
 			MVCTime::GetInstance()->SetLimit(m_stats.timeRef,i);
 			MVCTime::GetInstance()->ResetTime(m_stats.timeRef);
@@ -254,18 +277,16 @@ void SoldierSMControl::UnderFire(float priority)//state changer
 		{
 			cout<<"under fire\n";
 		}
-		int i=rand()%5;
+		int i=rand()%10;
 		if(i<priority)
 		{
-		//test for going under cover condition~number of bullets in proximity
-		//if success then move to cover else carry on
-			i=rand()%500+500-priority*300;//rand number between 1s-2s - priority*0.3s
+			//test for going under cover condition~number of bullets in proximity
+			//if success then move to cover else carry on
+			i=rand()%1000+750-priority*100;//rand number between 0.75-1.75s - priority*0.1s (time taken to get down)
 			if(i<0)
 			{
 				i=1;
 			}
-			cout<<"swapped to state move\n";
-			cout<<"	swapped to substate move to cover\n\n";
 			m_spdMult=0.5;
 			m_moveState=MOVETOCOVER;
 			m_state=MOVE;
@@ -298,9 +319,13 @@ void SoldierSMControl::Draw()
 		{
 			glColor3f(0.0,0.0,1.0);
 		}
+		else if(m_state==MOVE&&m_moveState==MOVETOCOVER)
+		{
+			glColor3f(1.0,0.0,1.0);
+		}
 		else
 		{
-			glColor3f(1.0,1.0,1.0);
+			glColor3f(1.0f,1.0f,1.f);
 		}
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
@@ -308,8 +333,22 @@ void SoldierSMControl::Draw()
 		glBindTexture(GL_TEXTURE_2D,soldierTex.texID);
 
 		glPushMatrix(); 
-			glRotatef(atan(spd.m_x/spd.m_y)/3.142*180,0,0,1);
+			
 			glTranslatef(pos.m_x,pos.m_y,pos.m_z);
+			if(spd.m_y>0)
+			{
+				if(spd.m_x>0)
+					glRotatef(atan(spd.m_y/spd.m_x)/3.142*180+90,0,0,1);
+				else
+					glRotatef(atan(spd.m_y/spd.m_x)/3.142*180+180,0,0,1);
+			}
+			else 
+			{
+				if(spd.m_x<0)
+					glRotatef(270-atan(spd.m_y/spd.m_x)/3.142*180,0,0,1);
+				else
+					glRotatef(atan(spd.m_y/spd.m_x)/3.142*180,0,0,1);
+			}
 			glScalef(50,50,0);
 			basicShape::drawSquare();
 		glPopMatrix();
@@ -317,5 +356,38 @@ void SoldierSMControl::Draw()
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 		glColor3f(1,1,1);
+	}
+}
+
+void SoldierSMControl::bulletHit(bullet* bul)
+{
+	if(bul->GetActive())
+	{
+		for(deque<bullet*>::iterator it=m_dodgeList.begin();it!=m_dodgeList.end();++it)
+		{
+			if((*it)==bul)
+			{
+				return;
+			}
+		}
+		if(m_state==MOVE&&m_moveState==MOVETOCOVER)
+		{
+			int i=rand()%2;
+			switch(i)
+			{
+			case 0:
+				m_dodgeList.push_back(bul);
+				break;
+			case 1:
+				bul->SetActive(false);
+				m_state=DAMAGE;
+				break;
+			}
+		}
+		else if(m_state!=COVER)//once in cover he will have 100% dodge chance
+		{
+			bul->SetActive(false);
+			m_state=DAMAGE;
+		}
 	}
 }

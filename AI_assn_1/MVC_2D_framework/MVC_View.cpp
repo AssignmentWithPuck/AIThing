@@ -14,6 +14,11 @@
 #include "MVCtime.h"
 #endif
 
+#ifndef __VECTOR_H__
+#include <vector>
+#define __VECTOR_H__
+#endif
+
 #ifndef __WINDOWS_H__
 #include <Windows.h> // Header File For Windows
 #define __WINDOWS_H__
@@ -27,6 +32,7 @@
 #define __GLU_H__
 #endif
 
+using namespace std;
 
 MVC_View::MVC_View(MVC_Model* theModel)
 {
@@ -64,12 +70,144 @@ BOOL MVC_View::Draw(void)
 	glEnable(GL_TEXTURE_2D);
 	glColor3f(1,1,1);
 	Printw(5,30,"FPS: %.2f",MVCTime::GetInstance()->GetFPS());
-
+	glPushMatrix();
+	glBindTexture(GL_TEXTURE_2D,m_theModel->background.texID);
+		glTranslatef(this->m_iWindows_Width*0.5,this->m_iWindows_Height*0.5,0);
+		glScalef(this->m_iWindows_Width,this->m_iWindows_Height,0);
+		basicShape::drawSquare();
+	glPopMatrix();	
 	ObjHandle::GetInstance()->Draw();
 	//m_theModel->thing.Draw();
-	m_theModel->thing2.Draw();
-	m_theModel->eng.Draw();
+	//m_theModel->thing2.Draw();
+	//m_theModel->eng.Draw();
+	glColor3f(0.1f,0.1f,0.1f);
+	Printw(30,40,"Soldier Victory: %d ",m_theModel->solVictory);
+	Printw(30,60,"Engineer Victory: %d ",m_theModel->engiVictory);
 
+	for(vector<baseObj*>::iterator it=ObjHandle::GetInstance()->m_AIList.begin();it!=ObjHandle::GetInstance()->m_AIList.end();++it)
+	{
+		if((*it)->GetActive())
+		{
+			switch((*it)->m_objType)
+			{
+			case SOLDIER_TYPE:
+				{
+					SoldierSMControl* temp=(SoldierSMControl*)(*it);
+					Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-40,"Current HP");
+					glPushMatrix();
+						glTranslatef(temp->GetPos().m_x+100+temp->m_stats.hp*5,temp->GetPos().m_y-47,0);
+						glScalef(temp->m_stats.hp*10,15,0);
+						glBindTexture(GL_TEXTURE_2D,NULL);
+						basicShape::drawCube();
+					glPopMatrix();
+					Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-55,"Ammo");
+					glPushMatrix();
+						glTranslatef(temp->GetPos().m_x+100+temp->m_stats.ammo*5,temp->GetPos().m_y-62,0);
+						glScalef(temp->m_stats.ammo*10,15,0);
+						glBindTexture(GL_TEXTURE_2D,NULL);
+						basicShape::drawCube();
+					glPopMatrix();
+					switch(temp->m_state)
+					{
+					case SoldierSMControl::MOVE:
+						switch(temp->m_moveState)
+						{
+						case SoldierSMControl::MOVEFORWARD:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: MoveForward");
+							break;
+						case SoldierSMControl::MOVETOCOVER:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: MoveToCover");
+							break;
+						case SoldierSMControl::MOVETOSHOOT:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: MoveToShoot");
+							break;
+						}
+						break;
+					case SoldierSMControl::ATTACK:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: Attack");
+
+						break;
+					case SoldierSMControl::COVER:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: Cover");
+
+						break;
+					case SoldierSMControl::DAMAGE:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: TakenDamaged");
+
+						break;
+					}
+				}
+				break;
+			case TURRET_TYPE:
+				{
+					CTurret* temp=(CTurret*)(*it);
+					Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-40,"Current HP");
+					glPushMatrix();
+						glTranslatef(temp->GetPos().m_x+100+temp->m_stats.hp*10,temp->GetPos().m_y-47,0);
+						glScalef(temp->m_stats.hp*20,15,0);
+						glBindTexture(GL_TEXTURE_2D,NULL);
+						basicShape::drawCube();
+					glPopMatrix();
+					Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-55,"Ammo");
+					glPushMatrix();
+						glTranslatef(temp->GetPos().m_x+100+temp->m_stats.ammo*15,temp->GetPos().m_y-62,0);
+						glScalef(temp->m_stats.ammo*30,15,0);
+						glBindTexture(GL_TEXTURE_2D,NULL);
+						basicShape::drawCube();
+					glPopMatrix();
+					switch(temp->m_state)
+					{
+					case CTurret::ATTACK:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: Attack");
+						break;
+					case CTurret::RELOAD:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: Reload");
+						break;
+					case CTurret::DAMAGED:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: TakenDamaged");
+						break;
+					}
+				}
+				break;
+			case ENGINEER_TYPE:
+				{
+					CEngineer* temp=(CEngineer*)(*it);
+					Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-40,"Current HP");
+					glPushMatrix();
+						glTranslatef(temp->GetPos().m_x+100+temp->m_stats.hp*10,temp->GetPos().m_y-47,0);
+						glScalef(temp->m_stats.hp*20,15,0);
+						glBindTexture(GL_TEXTURE_2D,NULL);
+						basicShape::drawCube();
+					glPopMatrix();
+					Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-55,"Repair charge");
+					glPushMatrix();
+						glTranslatef(temp->GetPos().m_x+100+temp->m_stats.charge*0.5*20,temp->GetPos().m_y-62,0);
+						glScalef(temp->m_stats.charge*20,15,0);
+						glBindTexture(GL_TEXTURE_2D,NULL);
+						basicShape::drawCube();
+					glPopMatrix();
+					switch(temp->m_state)
+					{
+					case CEngineer::IDLE:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: Idle");
+							break;
+					case CEngineer::REPAIR:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: Repair");
+						break;
+					case CEngineer::RECHARGE:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: Recharge");					
+						break;
+					case CEngineer::DAMAGED:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Current State: TakenDamaged");
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+	
+	glColor3f(1,1,1);
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1,1,1);
 	SwapBuffers(m_hDC); // Swap Buffers (Double Buffering)

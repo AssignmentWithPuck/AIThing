@@ -34,11 +34,17 @@ public:
 
 	//SoldierSMControl thing;
 
-	CTurret thing2;
+	//CTurret thing2;
 
-	CEngineer eng;
+	//CEngineer eng;
 
+	int timeHolder;
+
+	TextureImage background;
 	MVCTime* m_timer;
+	bool pause;
+	int solVictory;
+	int engiVictory;
 private: 
 };
 

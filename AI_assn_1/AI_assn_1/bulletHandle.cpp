@@ -18,6 +18,19 @@
 #include "soldier.h"
 #endif
 
+#ifndef __ENGINEER_H__
+#include "Engineer.h"
+#endif
+
+#ifndef __TURRET_H__
+#include "Turret.h"
+#endif
+
+#ifndef __IOSTREAM_H__
+#include <iostream>
+#define __IOSTREAM_H__
+#endif
+
 
 using namespace std;
 
@@ -44,6 +57,11 @@ Vector3D baseObj::GetSpd()
 bool baseObj::GetActive()
 {
 	return active;
+}
+
+void baseObj::SetActive(bool nActive)
+{
+	active=nActive;
 }
 
 baseObj::~baseObj()
@@ -160,10 +178,32 @@ void ObjHandle::PushObj(objType type,Vector3D pos)
 		}
 		break;
 	case ENGINEER_TYPE:
-		//for fuad to do	
+		{
+			CEngineer* temp=new CEngineer;
+			temp->SetPos(pos);
+			m_AIList.push_back(temp);
+			if(accessing)
+			{
+				addedStuff=true;
+				m_backLog.push_back(temp);
+			}
+			else
+				m_objList.push_back(temp);
+		}
 		break;
 	case TURRET_TYPE:
-		//for fuad to do	
+		{
+			CTurret* temp=new CTurret;
+			temp->SetPos(pos);
+			m_AIList.push_back(temp);
+			if(accessing)
+			{
+				addedStuff=true;
+				m_backLog.push_back(temp);
+			}
+			else
+				m_objList.push_back(temp);
+		}
 		break;
 	}
 }
@@ -173,7 +213,10 @@ void ObjHandle::Update(float delta)
 	accessing=true;
 	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
 	{
-		(*it)->Update(delta);
+		if((*it)->GetActive())
+		{
+			(*it)->Update(delta);
+		}
 	}
 	accessing=false;
 	if(addedStuff)
@@ -188,6 +231,48 @@ void ObjHandle::Update(float delta)
 		}
 		addedStuff=false;
 	}
+	//test collision)
+	for(vector<baseObj*>::iterator it=m_AIList.begin();it!=m_AIList.end();++it)
+	{
+		if((*it)->GetActive())
+		{
+			for(vector<bullet*>::iterator it2=m_bulletList.begin();it2!=m_bulletList.end();++it2)
+			{
+				if((*it2)->GetActive())
+				{
+					if((*it)->m_objType==SOLDIER_TYPE&&(*it2)->type!=SOLDIER)//the object is a soldier the bullet is not from a soldier
+					{
+						if(((*it)->GetPos()-(*it2)->GetPos()).GetMagnitudeSquare()<1055)
+						{
+							SoldierSMControl* temp=(SoldierSMControl*)(*it);
+							temp->bulletHit((*it2));
+							std::cout<<"soldier Damaged\n";
+						}
+					}
+					else if((*it2)->type==SOLDIER)//thing for Engineer/turret
+					{
+						if(((*it)->GetPos()-(*it2)->GetPos()).GetMagnitudeSquare()<1055)
+						{
+							switch((*it)->m_objType)
+							{
+							case TURRET_TYPE:
+								{
+									CTurret* temp=(CTurret*)(*it);
+									temp->bulletHit((*it2));
+								}
+								break;
+							case ENGINEER_TYPE:
+								{
+									CEngineer* temp=(CEngineer*)(*it);
+									temp->bulletHit((*it2));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void ObjHandle::Draw(void)
@@ -195,8 +280,11 @@ void ObjHandle::Draw(void)
 	accessing=true;
 	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
 	{
+		if((*it)->GetActive())
+		{
 		//draw here;
-		(*it)->Draw();
+			(*it)->Draw();
+		}
 	}
 	accessing =false;
 }
@@ -228,7 +316,6 @@ void ObjHandle::Drop()
 
 ObjHandle::~ObjHandle()
 {
-	Drop();
 }
 
 ObjHandle::ObjHandle()
