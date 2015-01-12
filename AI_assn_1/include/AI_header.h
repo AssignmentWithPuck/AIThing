@@ -5,6 +5,8 @@
 #include "vector3D.h"
 #endif
 
+#include "texture.h"
+
 #ifndef __VECTOR_H__
 #include <vector>
 #define __VECTOR_H__
@@ -35,7 +37,10 @@ enum objType
 {
 	SOLDIER_TYPE,
 	TURRET_TYPE,
-	ENGINEER_TYPE
+	ENGINEER_TYPE,
+	LEADER_TYPE,
+	NOSQUAD_TYPE,
+	SQUAD_TYPE
 };
 
 struct node
@@ -68,6 +73,7 @@ class bullet:public baseObj
 {
 public:
 	int lifeLeft;
+	TextureImage bulletTex;
 	source type;
 	void Update(float delta);
 	void Draw();

@@ -77,11 +77,18 @@ void bullet::Draw()
 {
 	if(active)
 	{
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		glBindTexture(GL_TEXTURE_2D,bulletTex.texID);
 		glPushMatrix();
 			glTranslatef(pos.m_x,pos.m_y,pos.m_z);
 			glScalef(15,15,0);
 			basicShape::drawSquare();
 		glPopMatrix();
+		glDisable(GL_BLEND);
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1,1,1);
 	}
 }
 
@@ -103,6 +110,7 @@ bullet::bullet()
 	active=true;
 	lifeLeft=0;
 	type=NONE;
+	LoadTGA(&bulletTex,"bullet.tga");
 }
 
 bullet::~bullet()
@@ -117,6 +125,7 @@ bullet::bullet(int life,Vector3D pos,Vector3D spd,source type)
 	this->spd=spd;
 	this->type=type;
 	this->active=true;
+	LoadTGA(&bulletTex,"bullet.tga");
 
 }
 

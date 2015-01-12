@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="bulletHandle.cpp" />
     <ClCompile Include="Engineer.cpp" />
+    <ClCompile Include="MessageBoard.cpp" />
     <ClCompile Include="mian.cpp" />
     <ClCompile Include="soldier.cpp" />
     <ClCompile Include="Turret.cpp" />
@@ -90,6 +91,7 @@
     <ClInclude Include="..\include\soldier.h" />
     <ClInclude Include="..\include\Turret.h" />
     <ClInclude Include="..\include\vector3D.h" />
+    <ClInclude Include="MessageBoard.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
