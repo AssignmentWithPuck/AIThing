@@ -71,7 +71,7 @@ public:
 	stats m_stats;
 	soldierState m_state;
 	moveSubState m_moveState;
-	bool init();
+	bool Init();
 	TextureImage soldierTex;
 	SoldierSMControl();
 	~SoldierSMControl();

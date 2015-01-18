@@ -39,6 +39,7 @@ public:
 	void SendMessage(MessageStruc*);
 	MessageBoard();
 	~MessageBoard();
+	virtual void Update();
 protected:
 	std::vector<MessageStruc*> messageList;
 };
@@ -62,9 +63,10 @@ public:
 	SquadBoard();
 	~SquadBoard();
 	bool active;
+	void Update();
 private:
 	baseObj* SLeader;
-	baseObj* SMember;
+	std::vector<baseObj*> SMember;
 };
 
 class Commander
@@ -75,7 +77,7 @@ public:
 	void Update();
 private:
 	void ProcessReports();
-	std::vector<MessageStruc*> orderList;
+	std::vector<MessageStruc*> orderList;//to change orders as nessasary
 };
 
 #endif

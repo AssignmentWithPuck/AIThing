@@ -54,6 +54,7 @@ class baseObj
 public:
 	virtual void Update(float delta)=0;
 	virtual void Draw()=0;
+	virtual bool Init()=0;
 	virtual void SetPos(Vector3D pos);
 	virtual void SetSpd(Vector3D spd);
 	Vector3D GetPos();
