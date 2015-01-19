@@ -29,14 +29,10 @@ bool MVC_Model::Init(float fpsLimit)
 
 bool MVC_Model::InitPhase2(void)
 {
-	ObjHandle::GetInstance()->PushObj(SOLDIER_TYPE,Vector3D(500,100,0));
-	ObjHandle::GetInstance()->PushObj(ENGINEER_TYPE,Vector3D(600,700,0));
-	ObjHandle::GetInstance()->PushObj(TURRET_TYPE,Vector3D(600,600,0));
 	LoadTGA(&background,"grassland.tga");
 	pause=false;
 	timeHolder=m_timer->PushNewTime(3000);
-	solVictory=0;
-	engiVictory=0;
+	theSquad.Update();
 	return true;
 }
 
@@ -48,28 +44,9 @@ void MVC_Model::Update(void)
 	{
 		if(m_timer->TestFramerate())//update control
 		{
-		
+			ProcMessages();
 			ObjHandle::GetInstance()->Update(m_timer->GetDelta());
 
-			for(vector<baseObj*>::iterator it=ObjHandle::GetInstance()->m_AIList.begin();it!=ObjHandle::GetInstance()->m_AIList.end();++it)
-			{
-				if(!(*it)->GetActive())
-				{
-					if((*it)->m_objType==SOLDIER_TYPE||(*it)->m_objType==TURRET_TYPE)
-					{
-						pause=true;
-						m_timer->ResetTime(timeHolder);
-						if((*it)->m_objType==SOLDIER_TYPE)
-						{
-							engiVictory++;
-						}
-						if((*it)->m_objType==TURRET_TYPE)
-						{
-							solVictory++;
-						}
-					}
-				}
-			}
 			//thing.SwitchState();
 			//thing2.SwitchState();
 			//eng.SwitchState();
@@ -85,10 +62,31 @@ void MVC_Model::Update(void)
 		{
 			pause=false;
 			ObjHandle::Drop();
-			ObjHandle::GetInstance()->PushObj(SOLDIER_TYPE,Vector3D(500,100,0));
-			ObjHandle::GetInstance()->PushObj(ENGINEER_TYPE,Vector3D(600,700,0));
-			ObjHandle::GetInstance()->PushObj(TURRET_TYPE,Vector3D(600,600,0));
 		}
 	}
 }
 
+void MVC_Model::ProcMessages()
+{
+	for(vector<MessageStruc*>::iterator it=MessageBoardGlobal::GetInstance()->messageList.begin();it!=MessageBoardGlobal::GetInstance()->messageList.end();++it)
+	{//goes through all messages
+		if((*it)->m_Type==REPORT)
+		{
+			if((*it)->m_Content==FINDINGSQUAD&&(*it)->active)
+			{
+				for(vector<MessageStruc*>::iterator it2=MessageBoardGlobal::GetInstance()->messageList.begin();it2!=MessageBoardGlobal::GetInstance()->messageList.end();++it2)
+				{
+					if((*it2)->active&&(*it2)->m_Content==RECRUITING&&!(*it2)->taken)
+					{
+						baseObj* temp = (baseObj*)(*it)->info;
+						theSquad.SMember.push_back(temp);
+						temp->squadBoard=&theSquad;
+						temp->m_objType=SOLDIER_TYPE;
+						(*it)->active=false;
+						break;
+					}
+				}
+			}
+		}
+	}
+}

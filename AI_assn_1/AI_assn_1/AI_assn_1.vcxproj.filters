@@ -53,10 +53,10 @@
     <ClInclude Include="..\include\Turret.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MessageBoard.h">
+    <ClInclude Include="..\include\MessageBoard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Soldier2.h">
+    <ClInclude Include="..\include\Soldier2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

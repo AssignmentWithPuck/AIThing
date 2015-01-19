@@ -107,6 +107,11 @@ void CEngineer::SwitchState()
 	}
 }
 
+bool CEngineer::Init()
+{
+	return true;
+}
+
 void CEngineer::Update(float delta)
 {
 	SwitchState();

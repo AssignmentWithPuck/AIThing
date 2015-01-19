@@ -25,6 +25,7 @@
 #define __GLU_H__
 #endif
 
+class SquadBoard;
 
 enum source
 {
@@ -43,6 +44,10 @@ enum objType
 	SQUAD_TYPE
 };
 
+struct stats2
+{
+	int hp;
+};
 struct node
 {
 	Vector3D pos;
@@ -61,9 +66,12 @@ public:
 	Vector3D GetSpd();
 	bool GetActive();
 	void SetActive(bool nActive);
+	stats2 m_stats;
 	baseObj();
 	~baseObj();
 	objType m_objType;
+	//move to protected after done testing
+	SquadBoard* squadBoard;
 protected:
 	bool active;
 	Vector3D pos,spd;
@@ -73,6 +81,7 @@ protected:
 class bullet:public baseObj
 {
 public:
+	bool Init();
 	int lifeLeft;
 	TextureImage bulletTex;
 	source type;

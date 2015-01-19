@@ -37,6 +37,7 @@ private:
 	void idleState();
 	TextureImage engiTex;
 public:
+	bool Init();
 	stats m_stats;
 	moveSubState m_moveState;
 	engineerState m_state;

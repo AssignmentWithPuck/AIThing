@@ -28,6 +28,7 @@ private:
 	void Shoot();
 	baseObj* atkTarget;
 public:
+	bool Init();
 	turretState m_state;
 	TextureImage turretTex;
 	stats m_stats;

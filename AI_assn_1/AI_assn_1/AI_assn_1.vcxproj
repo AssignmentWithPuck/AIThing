@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)lib</OutDir>
+    <OutDir>$(SolutionDir)lib\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -89,11 +89,11 @@
   <ItemGroup>
     <ClInclude Include="..\include\AI_header.h" />
     <ClInclude Include="..\include\Engineer.h" />
+    <ClInclude Include="..\include\MessageBoard.h" />
     <ClInclude Include="..\include\soldier.h" />
+    <ClInclude Include="..\include\Soldier2.h" />
     <ClInclude Include="..\include\Turret.h" />
     <ClInclude Include="..\include\vector3D.h" />
-    <ClInclude Include="MessageBoard.h" />
-    <ClInclude Include="Soldier2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

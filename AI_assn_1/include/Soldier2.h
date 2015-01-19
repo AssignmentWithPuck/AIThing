@@ -5,10 +5,6 @@
 #include "MessageBoard.h"
 
 
-struct stats2
-{
-	int hp;
-};
 
 enum soldierState2
 {
@@ -28,13 +24,11 @@ public:
 	void bulletHit(bullet* bul);
 	bool IsAlive();
 	TextureImage soldierTex;;
-	stats2 m_stats;
+	bool m_isLeader;
 
 private:
-	SquadBoard* squadBoard;
-	objType type;
+	bool reqSquad;
 	MessageStruc* m_currentOrders;
-	bool m_isLeader;
 	void Shoot();
 	bool m_underFire;
 	float m_spdMilt;

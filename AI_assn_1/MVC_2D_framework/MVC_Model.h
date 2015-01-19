@@ -16,6 +16,8 @@
 
 #include "Engineer.h"
 #include "Turret.h"
+#include "MessageBoard.h"
+#include "Soldier2.h"
 
 class MVCTime;
 
@@ -32,19 +34,15 @@ public:
 	float m_worldSizeX;
 	float m_worldSizeY;
 
-	//SoldierSMControl thing;
-
-	//CTurret thing2;
-
-	//CEngineer eng;
-
 	int timeHolder;
+
+	SquadBoard theSquad;
+	
+	void ProcMessages();
 
 	TextureImage background;
 	MVCTime* m_timer;
 	bool pause;
-	int solVictory;
-	int engiVictory;
 private: 
 };
 

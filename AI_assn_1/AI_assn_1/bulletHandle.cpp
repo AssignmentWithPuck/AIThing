@@ -14,8 +14,8 @@
 #include "basicShape.h"
 #endif
 
-#ifndef __SOLDIER_H__
-#include "soldier.h"
+#ifndef __SOLDIER2_H__
+#include "soldier2.h"
 #endif
 
 #ifndef __ENGINEER_H__
@@ -105,6 +105,11 @@ void bullet::Update(float delta)
 	}
 }
 
+bool bullet::Init()
+{
+	return true;
+}
+
 bullet::bullet()
 {
 	active=true;
@@ -174,21 +179,17 @@ void ObjHandle::PushObj(objType type,Vector3D pos)
 	{
 	case SOLDIER_TYPE:
 		{
-			SoldierSMControl* temp=new SoldierSMControl;
+			Soldier2* temp=new Soldier2;
+			temp->Init();
 			temp->SetPos(pos);
 			m_AIList.push_back(temp);
-			if(accessing)
-			{
-				addedStuff=true;
-				m_backLog.push_back(temp);
-			}
-			else
 				m_objList.push_back(temp);
 		}
 		break;
 	case ENGINEER_TYPE:
 		{
 			CEngineer* temp=new CEngineer;
+			temp->Init();
 			temp->SetPos(pos);
 			m_AIList.push_back(temp);
 			if(accessing)
@@ -203,6 +204,7 @@ void ObjHandle::PushObj(objType type,Vector3D pos)
 	case TURRET_TYPE:
 		{
 			CTurret* temp=new CTurret;
+			temp->Init();
 			temp->SetPos(pos);
 			m_AIList.push_back(temp);
 			if(accessing)
@@ -222,7 +224,11 @@ void ObjHandle::Update(float delta)
 	accessing=true;
 	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
 	{
-		if((*it)->GetActive())
+		if((*it)==NULL)
+		{
+			m_backLog.push_back(*it);
+		}
+		else if((*it)->GetActive())
 		{
 			(*it)->Update(delta);
 		}
@@ -247,37 +253,9 @@ void ObjHandle::Update(float delta)
 		{
 			for(vector<bullet*>::iterator it2=m_bulletList.begin();it2!=m_bulletList.end();++it2)
 			{
-				if((*it2)->GetActive())
+				if((*it2)->GetActive())//test bullet
 				{
-					if((*it)->m_objType==SOLDIER_TYPE&&(*it2)->type!=SOLDIER)//the object is a soldier the bullet is not from a soldier
-					{
-						if(((*it)->GetPos()-(*it2)->GetPos()).GetMagnitudeSquare()<1055)
-						{
-							SoldierSMControl* temp=(SoldierSMControl*)(*it);
-							temp->bulletHit((*it2));
-							std::cout<<"soldier Damaged\n";
-						}
-					}
-					else if((*it2)->type==SOLDIER)//thing for Engineer/turret
-					{
-						if(((*it)->GetPos()-(*it2)->GetPos()).GetMagnitudeSquare()<1055)
-						{
-							switch((*it)->m_objType)
-							{
-							case TURRET_TYPE:
-								{
-									CTurret* temp=(CTurret*)(*it);
-									temp->bulletHit((*it2));
-								}
-								break;
-							case ENGINEER_TYPE:
-								{
-									CEngineer* temp=(CEngineer*)(*it);
-									temp->bulletHit((*it2));
-								}
-							}
-						}
-					}
+					//test orgin of the bullet against the colided object
 				}
 			}
 		}

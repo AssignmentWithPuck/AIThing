@@ -17,6 +17,9 @@
 #include "MVC_View.h"
 #endif
 
+#include "MessageBoard.h"
+
+using namespace std;
 
 HDC			hDC=NULL;		// Private GDI Device Context
 HGLRC		hRC=NULL;		// Permanent Rendering Context
@@ -181,6 +184,25 @@ void MVC_Controller::ProcKeyboard()
 	if(temp[VK_SPACE])
 	{
 		//m_theModel->thing.UnderFire();
+	}
+	if(temp['A'])
+	{
+		ObjHandle::GetInstance()->PushObj(SOLDIER_TYPE,Vector3D(rand()%400+50,rand()%400+50,0));
+		temp['A']=false;
+	}
+	if(temp['D'])
+	{
+		m_theModel->theSquad.SLeader->m_stats.hp=0;
+		temp['D']=false;
+	}
+	if(temp['S'])
+	{
+		for(vector<MessageStruc*>::iterator it=m_theModel->theSquad.sentMessages.begin();it!=m_theModel->theSquad.sentMessages.end();++it)
+		{
+			if((*it)->m_Content==RECRUITING);
+			(*it)->taken=!(*it)->taken;
+		}
+		temp['S']=false;
 	}
 
 }

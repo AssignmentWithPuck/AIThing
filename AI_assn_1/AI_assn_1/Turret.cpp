@@ -59,6 +59,11 @@ CTurret::~CTurret(void)
 {
 }
 
+bool CTurret::Init()
+{
+	return true;
+}
+
 void CTurret::SwitchState()
 {
 	if(m_stats.hp >= 5){

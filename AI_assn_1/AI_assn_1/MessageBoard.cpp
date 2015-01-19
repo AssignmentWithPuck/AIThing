@@ -18,11 +18,12 @@ void MessageBoard::SendMessage1(MessageStruc* nMessage)
 
 MessageStruc* MessageBoard::GetMessage1(objType target)
 {
+	Update();
 	int currentPrior=-1;
 	vector<MessageStruc*>::iterator temp;
 	for(vector<MessageStruc*>::iterator it;it!=messageList.end();++it)
 	{
-		if((*it)->target!=target)
+		if((*it)->target!=target||!(*it)->active||(*it)->taken)
 			continue;
 		if((*it)->priority>currentPrior)
 		{
@@ -36,12 +37,13 @@ MessageStruc* MessageBoard::GetMessage1(objType target)
 
 MessageStruc* MessageBoard::GetMessage1(MessageType targetType)
 {
+	Update();
 	int currentPrior=-1;
 	
 	vector<MessageStruc*>::iterator temp;
-	for(vector<MessageStruc*>::iterator it;it!=messageList.end();++it)
+	for(vector<MessageStruc*>::iterator it=messageList.begin();it!=messageList.end();++it)
 	{
-		if((*it)->m_Type!=targetType)
+		if((*it)->m_Type!=targetType||!(*it)->active||(*it)->taken)
 			continue;
 		if((*it)->priority>currentPrior)
 		{
@@ -55,12 +57,14 @@ MessageStruc* MessageBoard::GetMessage1(MessageType targetType)
 
 MessageStruc* MessageBoard::GetMessage1(objType target,MessageType targetType)
 {
+	Update();
 	int currentPrior=-1;
 	
 	vector<MessageStruc*>::iterator temp;
-	for(vector<MessageStruc*>::iterator it;it!=messageList.end();++it)
+	temp._Ptr=NULL;
+	for(vector<MessageStruc*>::iterator it=messageList.begin();it!=messageList.end();++it)
 	{
-		if((*it)->m_Type!=targetType||(*it)->target!=target)
+		if((*it)->m_Type!=targetType||(*it)->target!=target||!(*it)->active||(*it)->taken)
 			continue;
 		if((*it)->priority>currentPrior)
 		{
@@ -68,20 +72,40 @@ MessageStruc* MessageBoard::GetMessage1(objType target,MessageType targetType)
 			currentPrior=(*it)->priority;
 		}
 	}
-	MessageStruc* temp2=*temp;
-	return temp2;
+	if(temp._Ptr!=NULL)
+	{
+		MessageStruc* temp2=*temp;
+		return temp2;
+	}
+	return NULL;
 }
 
 void MessageBoard::Update()
 {
-	for(vector<MessageStruc*>::iterator it;it!=messageList.end();++it)
+	for(vector<MessageStruc*>::iterator it=messageList.begin();it!=messageList.end();++it)
 	{
-		if(!(*it)->active)
-			continue;
+		while(!(*it)->active)
+		{
+			MessageStruc* temp=*it;
+			delete temp;
+			temp=NULL;
+			if(it==messageList.end()-1)
+			{
+				messageList.pop_back();
+				return;
+			}
+			swap(it,messageList.end());
+			messageList.pop_back();
+		}
+		if(*it==NULL)
+			return;
+
 		if(!(*it)->general)
 			(*it)->priority++;
 	}
 }
+
+MessageBoardGlobal* MessageBoardGlobal::s_instance=NULL;
 
 MessageBoardGlobal* MessageBoardGlobal::GetInstance()
 {
@@ -97,6 +121,7 @@ void MessageBoardGlobal::Drop()
 	if(s_instance!=NULL)
 	{
 		delete s_instance;
+		s_instance=NULL;
 	}
 }
 
@@ -112,7 +137,7 @@ MessageBoardGlobal::~MessageBoardGlobal()
 
 SquadBoard::SquadBoard()
 {
-
+	SLeader=NULL;
 }
 
 SquadBoard::~SquadBoard()
@@ -122,18 +147,45 @@ SquadBoard::~SquadBoard()
 
 void SquadBoard::Update()
 {
-	if(SMember.size()<=0)
+	//if(active)
 	{
-		active=false;
-	}
-	else
-		active=true;
-	if(active)
-	{
+		int go=false;
+		for(vector<MessageStruc*>::iterator it=messageList.end();it!=messageList.end();++it)
+		{
+			while(!(*it)->active&&!go)
+			{
+				MessageStruc* temp=*it;
+				delete temp;
+				temp=NULL;
+				if(it==messageList.end())
+				{
+					go=true;
+					messageList.pop_back();
+				}
+				swap(it,messageList.end());
+				messageList.pop_back();
+			}
+			if(go)
+				break;
+		}
+	
+		for(vector<MessageStruc*>::iterator it=sentMessages.begin();it!=sentMessages.end();++it)
+		{
+			while((*it)==NULL)
+			{
+				swap(it,messageList.end());
+				messageList.pop_back();
+			}
+			while(!(*it)->active)
+			{
+				swap(it,messageList.end());
+				messageList.pop_back();
+			}
+		}
 		if(SLeader==NULL)
 		{
 			bool send=true;
-			for(vector<MessageStruc*>::iterator it;it!=messageList.end();++it)
+			for(vector<MessageStruc*>::iterator it=messageList.begin();it!=messageList.end();++it)
 			{
 				if((*it)->m_Content==LEADERDOWN&&!(*it)->taken)
 				{
@@ -154,7 +206,21 @@ void SquadBoard::Update()
 				SendMessage1(temp);
 			}
 		}
-		for(vector<MessageStruc*>::iterator it;it!=messageList.end();++it)
+		if(SMember.size()<=0)
+		{
+			MessageStruc* temp=new MessageStruc;
+			temp->active=true;
+			temp->taken=false;
+			temp->general=false;
+			temp->m_Type=REPORT;
+			temp->m_Content=RECRUITING;
+			temp->target=objType::NOSQUAD_TYPE;
+			temp->priority=50;
+			temp->info=this;
+			MessageBoardGlobal::GetInstance()->SendMessage1(temp);
+			sentMessages.push_back(temp);
+		}
+		for(vector<MessageStruc*>::iterator it=messageList.begin();it!=messageList.end();++it)
 		{
 			if((*it)->active!=true)
 				continue;
@@ -162,4 +228,9 @@ void SquadBoard::Update()
 				(*it)->priority++;
 		}
 	}
+}
+
+void SquadBoard::PushMember(baseObj* nObj)
+{
+
 }

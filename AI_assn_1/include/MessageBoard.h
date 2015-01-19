@@ -19,10 +19,13 @@ enum MessageType
 enum MessageContent
 {
 	ATTACKHERE,
-	LEADERDOWN
+	LEADERDOWN,
+	RETREAT,
+	RECRUITING,
+	FINDINGSQUAD
 };
 
-struct MessageStruc
+struct MessageStruc//probably consider changing the info to templates
 {
 	MessageType m_Type;//this should tell where its from
 	MessageContent m_Content;
@@ -44,8 +47,8 @@ public:
 	MessageBoard();
 	~MessageBoard();
 	virtual void Update();
-protected:
 	std::vector<MessageStruc*> messageList;
+protected:
 };
 
 class MessageBoardGlobal:public MessageBoard//communication between squads
@@ -68,6 +71,8 @@ public:
 	~SquadBoard();
 	bool active;
 	void Update();
+	std::vector<MessageStruc*> sentMessages;
+	void PushMember(baseObj*);
 	baseObj* SLeader;
 	std::vector<baseObj*> SMember;
 };

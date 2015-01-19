@@ -1,5 +1,8 @@
 #include "Soldier2.h"
 
+#ifndef __BASIC_H__
+#include "basicShape.h"
+#endif
 
 Soldier2::Soldier2(void)
 {
@@ -12,8 +15,84 @@ Soldier2::~Soldier2(void)
 
 bool Soldier2::Init()
 {
-	type=objType::NOSQUAD_TYPE;
-	
+	m_objType=objType::NOSQUAD_TYPE;
+	m_isLeader=false;
+	m_currentOrders=NULL;
+	reqSquad=false;
+	squadBoard=NULL;
+	m_stats.hp=5;
+	if(!LoadTGA(&soldierTex,"Soldier.tga"))
+	{
+		return false;
+		//cout<<"error loading textures\n";
+	}
+	return true;
+}
+
+void Soldier2::Draw()
+{
+	if(IsAlive())
+	{
+		//if(m_stats.proning==true)
+		//{
+		//	glColor3f(0.0,0.0,1.0);
+		//}
+		//else if(m_state==MOVE&&m_moveState==MOVETOCOVER)
+		//{
+		//	glColor3f(1.0,0.0,1.0);
+		//}
+		//else
+		if(m_isLeader==true)
+		{
+			glColor3f(1.0f,0.0,1.0f);
+		}
+		else if(m_objType==SOLDIER_TYPE)
+		{
+			glColor3f(1.0f,1.0f,1.f);
+		}
+		else if(m_objType==NOSQUAD_TYPE)
+		{
+			glColor3f(0.0f,0.0f,1.0f);
+		}
+		else
+		{
+			glColor3f(0.0f,0.0f,0.f);
+		}
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		glBindTexture(GL_TEXTURE_2D,soldierTex.texID);
+
+		glPushMatrix(); 
+			
+			glTranslatef(pos.m_x,pos.m_y,pos.m_z);
+			/*if(spd.m_y>0)
+			{
+				if(spd.m_x>0)
+					glRotatef(atan(spd.m_y/spd.m_x)/3.142*180+90,0,0,1);
+				else
+					glRotatef(atan(spd.m_y/spd.m_x)/3.142*180+180,0,0,1);
+			}
+			else 
+			{
+				if(spd.m_x<0)
+					glRotatef(270-atan(spd.m_y/spd.m_x)/3.142*180,0,0,1);
+				else
+					glRotatef(atan(spd.m_y/spd.m_x)/3.142*180,0,0,1);
+			}*/
+			glScalef(50,50,0);
+			basicShape::drawSquare();
+		glPopMatrix();
+
+		glDisable(GL_BLEND);
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1,1,1);
+	}
+}
+
+bool Soldier2::IsAlive()
+{
+	return true;
 }
 
 void Soldier2::Update(float delta)
@@ -25,22 +104,24 @@ void Soldier2::Update(float delta)
 			MessageBoardGlobal* messageBoardG=MessageBoardGlobal::GetInstance();
 			if(m_currentOrders==NULL)
 			{
-				m_currentOrders=messageBoardG->GetMessage1(ORDER);//no obj type cause
+				m_currentOrders=messageBoardG->GetMessage1(SQUAD_TYPE,ORDER);
 				if(m_currentOrders->general==false)
 					m_currentOrders->taken=true;
 			}
 			else
 			{
-				MessageStruc* temp=messageBoardG->GetMessage1(ORDER);
-				if(temp->priority>m_currentOrders->priority)
-				{
-					temp->taken=true;
-					m_currentOrders->taken=false;
-					m_currentOrders=temp;
-				}
+				MessageStruc* temp=messageBoardG->GetMessage1(SQUAD_TYPE,ORDER);
+				if(temp!=NULL)
+					if(temp->priority>m_currentOrders->priority)
+					{
+						temp->taken=true;
+						m_currentOrders->taken=false;
+						m_currentOrders=temp;
+					}
 			}
 			if(m_stats.hp<=0)
 			{
+				active=false;
 				MessageStruc* temp=new MessageStruc;
 				temp->active=true;
 				temp->taken=false;
@@ -55,100 +136,148 @@ void Soldier2::Update(float delta)
 			else//still alive
 			{
 				//send orders to squad
-				switch(m_currentOrders->m_Content)
+				if(m_currentOrders!=NULL)//if not null
 				{
-				case ATTACKHERE:
+					switch(m_currentOrders->m_Content)
 					{
-						MessageStruc* temp=new MessageStruc;
-						temp->active=true;
-						temp->taken=false;
-						temp->general=true;
-						temp->m_Type=ORDER;
-						temp->m_Content=ATTACKHERE;
-						temp->target=objType::SOLDIER_TYPE;
-						temp->priority=0;
-						temp->info=m_currentOrders->info;
-						squadBoard->SendMessage1(temp);
+					case ATTACKHERE:
+						{
+							MessageStruc* temp=new MessageStruc;
+							temp->active=true;
+							temp->taken=false;
+							temp->general=true;
+							temp->m_Type=ORDER;
+							temp->m_Content=ATTACKHERE;
+							temp->target=objType::SOLDIER_TYPE;
+							temp->priority=0;
+							temp->info=m_currentOrders->info;
+							squadBoard->SendMessage1(temp);
+						}
+						break;
+					case RETREAT:
+						{
+							//if case for if near base
+							MessageStruc* temp=new MessageStruc;
+							temp->active=true;
+							temp->taken=false;
+							temp->general=false;
+							temp->m_Type=ORDER;
+							temp->m_Content=RECRUITING;
+							temp->priority=50;
+							temp->info=squadBoard;
+							messageBoardG->SendMessage1(temp);
+							squadBoard->sentMessages.push_back(temp);
+							//else 
+							//carry on retreating
+						}
 					}
-					break;
+					bool changedState=false;//to check if state has been changed
+				
+					//switch state(only test conditions)
+
+					if(!changedState)
+					{
+						switch(m_currentOrders->m_Content)
+						{
+						case ATTACKHERE:
+							{
+								Vector3D atkPos=*(Vector3D*)(m_currentOrders->info);
+								if((this->pos-atkPos).GetMagnitudeSquare()>10000)
+								{
+									//state = movestate
+								}
+								else
+								{
+									//state = atkstate
+								}
+							}
+							break;
+						}
+					}
 				}
+				//else do nothing
+			}
+			
+		}
+		else//not leader
+		{
+			if(squadBoard!=NULL)
+			{
+				if(m_currentOrders==NULL)
+				{
+					m_currentOrders=squadBoard->GetMessage1(m_objType,ORDER);
+					if(m_currentOrders!=NULL)
+						if(m_currentOrders->general==false)
+						{
+							m_currentOrders->taken=true;
+						}
+				}
+				else
+				{
+					MessageStruc* temp=squadBoard->GetMessage1(m_objType,ORDER);
+					if(temp!=NULL)
+						if(temp->priority>m_currentOrders->priority)
+						{
+							if(temp->general==false)
+								temp->taken=true;
+							m_currentOrders->taken=false;
+							m_currentOrders=temp;
+						}
+				}
+
+				//switch state
+			
 				bool changedState=false;//to check if state has been changed
 			
 				//switch state(only test conditions)
 
 				if(!changedState)
 				{
-					switch(m_currentOrders->m_Content)
+					if(m_currentOrders!=NULL)
 					{
-					case ATTACKHERE:
+						switch(m_currentOrders->m_Content)
 						{
-							Vector3D atkPos=*(Vector3D*)(m_currentOrders->info);
-							if((this->pos-atkPos).GetMagnitudeSquare()>10000)
+						case LEADERDOWN:
+							m_currentOrders->active=false;
+							m_isLeader=true;
+							squadBoard->SLeader=this;//this is to set the leader in the squadboard
+							break;
+						case ATTACKHERE:
 							{
-								//state = movestate
+								Vector3D atkPos=*(Vector3D*)(m_currentOrders->info);
+								if((this->pos-atkPos).GetMagnitudeSquare()>10000)
+								{
+									//state = movestate
+								}
+								else
+								{
+									//state = atkstate
+								}
 							}
-							else
-							{
-								//state = atkstate
-							}
+							break;
 						}
-						break;
 					}
 				}
 			}
-		}
-		else//not leader
-		{
-			if(m_currentOrders==NULL)
+			else//no squadboard aka nosquad type
 			{
-				m_currentOrders=squadBoard->GetMessage1(type,ORDER);
-				if(m_currentOrders->general==false)
+				if(!reqSquad)
 				{
-					m_currentOrders->taken=true;
-				}
-			}
-			else
-			{
-				MessageStruc* temp=squadBoard->GetMessage1(type,ORDER);
-				if(temp->priority>m_currentOrders->priority)
-				{
-					if(temp->general==false)
-						temp->taken=true;
-					m_currentOrders->taken=false;
-					m_currentOrders=temp;
-				}
-			}
+					MessageStruc* temp=new MessageStruc;
+					temp->active=true;
+					temp->taken=false;
+					temp->general=false;
+					temp->m_Type=REPORT;
+					temp->m_Content=FINDINGSQUAD;
+					temp->priority=50;
+					temp->info=this;
 
-			//switch state
-			
-			bool changedState=false;//to check if state has been changed
-			
-			//switch state(only test conditions)
-
-			if(!changedState)
-			{
-				switch(m_currentOrders->m_Content)
-				{
-				case LEADERDOWN:
-					m_isLeader=true;
-					squadBoard->SLeader=this;//this is to set the leader in the squadboard
-					break;
-				case ATTACKHERE:
-					{
-						Vector3D atkPos=*(Vector3D*)(m_currentOrders->info);
-						if((this->pos-atkPos).GetMagnitudeSquare()>10000)
-						{
-							//state = movestate
-						}
-						else
-						{
-							//state = atkstate
-						}
-					}
-					break;
+					MessageBoardGlobal::GetInstance()->SendMessage1(temp);
+					reqSquad=true;
 				}
 			}
 		}
+		
 	}
 		//update stuff
 
