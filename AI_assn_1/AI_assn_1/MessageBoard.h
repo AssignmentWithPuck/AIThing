@@ -19,14 +19,16 @@ enum MessageType
 enum MessageContent
 {
 	ATTACKHERE,
-	HEALME
+	LEADERDOWN
 };
 
 struct MessageStruc
 {
-	MessageType mType;//this should tell where its from
-	MessageContent mContent;
+	MessageType m_Type;//this should tell where its from
+	MessageContent m_Content;
 	bool active;//to be deleted or not
+	bool general;//if its a general message meant for everyone//priority will not increase
+	bool taken;//to test if its being used by someone alreadys
 	objType target;//what to target not a pointer so its a general target
 	int priority;//starting priority min 0-not important, max 100-should be immediate
 	void* info;//additional info(can be anything, such as a position,a target or nothing)
@@ -35,8 +37,10 @@ struct MessageStruc
 class MessageBoard
 {
 public:
-	MessageStruc* GetMessage(objType);
-	void SendMessage(MessageStruc*);
+	virtual MessageStruc* GetMessage1(objType);
+	virtual MessageStruc* GetMessage1(objType, MessageType);
+	virtual MessageStruc* GetMessage1(MessageType);
+	virtual void SendMessage1(MessageStruc*);
 	MessageBoard();
 	~MessageBoard();
 	virtual void Update();
@@ -64,7 +68,6 @@ public:
 	~SquadBoard();
 	bool active;
 	void Update();
-private:
 	baseObj* SLeader;
 	std::vector<baseObj*> SMember;
 };
