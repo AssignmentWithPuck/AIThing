@@ -22,7 +22,9 @@ enum MessageContent
 	LEADERDOWN,
 	RETREAT,
 	RECRUITING,
-	FINDINGSQUAD
+	FINDINGSQUAD,
+	HEAL,
+	BUSY
 };
 
 struct MessageStruc//probably consider changing the info to templates

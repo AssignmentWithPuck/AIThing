@@ -2,6 +2,8 @@
 #include "vector3D.h"
 #include "AI_header.h"
 #include "Turret.h"
+#include "MessageBoard.h"
+
 class CEngineer : public baseObj
 {
 public:
@@ -32,10 +34,13 @@ public:
 
 private:
 	CTurret* repairTarget;
+	MessageStruc* m_currentOrders;
 	void repairState();
 	void rechargeState();
 	void idleState();
 	TextureImage engiTex;
+
+
 public:
 	bool Init();
 	stats m_stats;

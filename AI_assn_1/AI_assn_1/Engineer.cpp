@@ -72,7 +72,7 @@ void CEngineer::SwitchState()
 				}
 			}
 		}
-		if(repairTarget!=NULL)
+		if(repairTarget!=NULL && HEAL)
 			m_state = REPAIR;
 		break;
 	case REPAIR:
@@ -114,6 +114,50 @@ bool CEngineer::Init()
 
 void CEngineer::Update(float delta)
 {
+	if(squadBoard!=NULL)
+			{
+				if(m_currentOrders==NULL)
+				{
+					m_currentOrders=squadBoard->GetMessage1(m_objType,ORDER);
+					if(m_currentOrders!=NULL)
+						if(m_currentOrders->general==false)
+						{
+							m_currentOrders->taken=true;
+						}
+				}
+				else
+				{
+					MessageStruc* temp=squadBoard->GetMessage1(m_objType,ORDER);
+					if(temp!=NULL)
+						if(temp->priority>m_currentOrders->priority)
+						{
+							if(temp->general==false)
+								temp->taken=true;
+							m_currentOrders->taken=false;
+							m_currentOrders=temp;
+						}
+				}
+
+				//switch state
+			
+				bool changedState=false;//to check if state has been changed
+
+				if(!changedState)
+				{
+					if(m_currentOrders!=NULL)
+					{
+						switch(m_currentOrders->m_Content)
+						{
+						case HEAL:
+							{
+								
+							}
+							break;
+						}
+					}
+				}
+	}
+
 	SwitchState();
 	switch(m_state)
 	{
@@ -131,6 +175,7 @@ void CEngineer::Update(float delta)
 			m_stats.charge++;
 		}
 	}
+
 }
 
 void CEngineer::repairState(){

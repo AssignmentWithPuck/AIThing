@@ -219,11 +219,54 @@ void CTurret::Draw()
 
 void CTurret::Update(float delta)
 {
-	if(atkTarget!=NULL)
-	{
-		atkDir=atkTarget->GetPos()-pos;
-		atkDir.NormalizeVector3D();
+	if(squadBoard!=NULL)
+			{
+				if(m_currentOrders==NULL)
+				{
+					m_currentOrders=squadBoard->GetMessage1(m_objType,ORDER);
+					if(m_currentOrders!=NULL)
+						if(m_currentOrders->general==false)
+						{
+							m_currentOrders->taken=true;
+						}
+				}
+				else
+				{
+					MessageStruc* temp=squadBoard->GetMessage1(m_objType,ORDER);
+					if(temp!=NULL)
+						if(temp->priority>m_currentOrders->priority)
+						{
+							if(temp->general==false)
+								temp->taken=true;
+							m_currentOrders->taken=false;
+							m_currentOrders=temp;
+						}
+				}
+
+				//switch state
+			
+				bool changedState=false;//to check if state has been changed
+
+				if(!changedState)
+				{
+					if(m_currentOrders!=NULL)
+					{
+						switch(m_currentOrders->m_Content)
+						{
+						case ATTACKHERE:
+							{
+								if(atkTarget!=NULL)
+								{
+									atkDir=atkTarget->GetPos()-pos;
+									atkDir.NormalizeVector3D();
+								}
+							}
+							break;
+						}
+					}
+				}
 	}
+
 	SwitchState();
 	switch(m_state)
 	{

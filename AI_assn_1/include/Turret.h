@@ -2,6 +2,8 @@
 #include "vector3D.h"
 #include "AI_header.h"
 #include  "texture.h"
+#include "MessageBoard.h"
+
 class CTurret : public baseObj
 {
 public:
@@ -27,6 +29,9 @@ private:
 	void reloadState();
 	void Shoot();
 	baseObj* atkTarget;
+	MessageStruc* m_currentOrders;
+
+
 public:
 	bool Init();
 	turretState m_state;
