@@ -223,7 +223,7 @@ void CTurret::Update(float delta)
 			{
 				if(m_currentOrders==NULL)
 				{
-					m_currentOrders=squadBoard->GetMessage1(m_objType,ORDER);
+					m_currentOrders=squadBoard->GetMessage1(this,ORDER);
 					if(m_currentOrders!=NULL)
 						if(m_currentOrders->general==false)
 						{
@@ -232,7 +232,7 @@ void CTurret::Update(float delta)
 				}
 				else
 				{
-					MessageStruc* temp=squadBoard->GetMessage1(m_objType,ORDER);
+					MessageStruc* temp=squadBoard->GetMessage1(this,ORDER);
 					if(temp!=NULL)
 						if(temp->priority>m_currentOrders->priority)
 						{

@@ -104,13 +104,13 @@ void Soldier2::Update(float delta)
 			MessageBoardGlobal* messageBoardG=MessageBoardGlobal::GetInstance();
 			if(m_currentOrders==NULL)
 			{
-				m_currentOrders=messageBoardG->GetMessage1(SQUAD_TYPE,ORDER);
+				m_currentOrders=messageBoardG->GetMessage1(SQUAD_TYPE,ORDER,this);
 				if(m_currentOrders->general==false)
 					m_currentOrders->taken=true;
 			}
 			else
 			{
-				MessageStruc* temp=messageBoardG->GetMessage1(SQUAD_TYPE,ORDER);
+				MessageStruc* temp=messageBoardG->GetMessage1(SQUAD_TYPE,ORDER,this);
 				if(temp!=NULL)
 					if(temp->priority>m_currentOrders->priority)
 					{
@@ -205,7 +205,7 @@ void Soldier2::Update(float delta)
 			{
 				if(m_currentOrders==NULL)
 				{
-					m_currentOrders=squadBoard->GetMessage1(m_objType,ORDER);
+					m_currentOrders=squadBoard->GetMessage1(this,ORDER);
 					if(m_currentOrders!=NULL)
 						if(m_currentOrders->general==false)
 						{
@@ -214,7 +214,7 @@ void Soldier2::Update(float delta)
 				}
 				else
 				{
-					MessageStruc* temp=squadBoard->GetMessage1(m_objType,ORDER);
+					MessageStruc* temp=squadBoard->GetMessage1(this,ORDER);
 					if(temp!=NULL)
 						if(temp->priority>m_currentOrders->priority)
 						{
@@ -282,7 +282,8 @@ void Soldier2::Update(float delta)
 		//update stuff
 
 
-		/*test if leader
+		/*psudo code for this method
+		test if leader
 		{
 			check global messages
 

@@ -54,6 +54,8 @@ struct node
 	std::vector<node*> neighbour;
 };
 
+struct MessageStruc;
+
 class baseObj
 {
 public:
@@ -72,6 +74,7 @@ public:
 	objType m_objType;
 	//move to protected after done testing
 	SquadBoard* squadBoard;
+	MessageStruc* m_currentOrders;
 protected:
 	bool active;
 	Vector3D pos,spd;

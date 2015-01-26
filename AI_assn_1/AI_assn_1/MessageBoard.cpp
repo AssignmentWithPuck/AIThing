@@ -1,4 +1,5 @@
 #include "MessageBoard.h"
+#include <vector>
 
 using namespace std;
 
@@ -16,73 +17,71 @@ void MessageBoard::SendMessage1(MessageStruc* nMessage)
 	messageList.push_back(nMessage);
 }
 
-MessageStruc* MessageBoard::GetMessage1(objType target)
+MessageStruc* MessageBoard::GetMessage1(baseObj* from)//from is the person that called this function
 {
 	Update();
+	objType target=from->m_objType;
 	int currentPrior=-1;
-	vector<MessageStruc*>::iterator temp;
+	MessageStruc* temp=NULL;
 	for(vector<MessageStruc*>::iterator it;it!=messageList.end();++it)
 	{
 		if((*it)->target!=target||!(*it)->active||(*it)->taken)
 			continue;
 		if((*it)->priority>currentPrior)
 		{
-			temp=(it);
+			temp=(*it);
 			currentPrior=(*it)->priority;
 		}
 	}
-	MessageStruc* temp2=*temp;
-	return temp2;
+	if(temp!=NULL)
+		(temp)->takenBy=from;
+	return temp;
 }
 
-MessageStruc* MessageBoard::GetMessage1(MessageType targetType)
+MessageStruc* MessageBoard::GetMessage1(objType target,MessageType targetType,baseObj* from)//from is the person that called this function
 {
 	Update();
 	int currentPrior=-1;
-	
-	vector<MessageStruc*>::iterator temp;
+	MessageStruc* temp=NULL;
 	for(vector<MessageStruc*>::iterator it=messageList.begin();it!=messageList.end();++it)
 	{
-		if((*it)->m_Type!=targetType||!(*it)->active||(*it)->taken)
+		if((*it)->target!=target||!(*it)->active||(*it)->taken)
 			continue;
 		if((*it)->priority>currentPrior)
 		{
-			temp=(it);
+			temp=(*it);
 			currentPrior=(*it)->priority;
 		}
 	}
-	MessageStruc* temp2=*temp;
-	return temp2;
+	if(temp!=NULL)
+		(temp)->takenBy=from;
+	return temp;
 }
 
-MessageStruc* MessageBoard::GetMessage1(objType target,MessageType targetType)
+MessageStruc* MessageBoard::GetMessage1(baseObj* from,MessageType targetType)
 {
 	Update();
 	int currentPrior=-1;
-	
-	vector<MessageStruc*>::iterator temp;
-	temp._Ptr=NULL;
+	objType target=from->m_objType;	
+	MessageStruc* temp=NULL;
 	for(vector<MessageStruc*>::iterator it=messageList.begin();it!=messageList.end();++it)
 	{
 		if((*it)->m_Type!=targetType||(*it)->target!=target||!(*it)->active||(*it)->taken)
 			continue;
 		if((*it)->priority>currentPrior)
 		{
-			temp=(it);
+			temp=(*it);
 			currentPrior=(*it)->priority;
 		}
 	}
-	if(temp._Ptr!=NULL)
-	{
-		MessageStruc* temp2=*temp;
-		return temp2;
-	}
-	return NULL;
+	if(temp!=NULL)
+		(temp)->takenBy=from;//above cause it temp2 can be null
+	return temp;
 }
 
 void MessageBoard::Update()
 {
-	for(vector<MessageStruc*>::iterator it=messageList.begin();it!=messageList.end();++it)
+	for(vector<MessageStruc*>::iterator it=messageList.begin();it!=messageList.end();)
 	{
 		while(!(*it)->active)
 		{
@@ -93,15 +92,16 @@ void MessageBoard::Update()
 			{
 				messageList.pop_back();
 				return;
-			}
-			swap(it,messageList.end());
-			messageList.pop_back();
+			}			
+			it = messageList.erase(it);
+			continue;
 		}
-		if(*it==NULL)
-			return;
+		//if(*it==NULL)
+		//	continue;
 
 		if(!(*it)->general)
 			(*it)->priority++;
+		++it;
 	}
 }
 
@@ -232,5 +232,84 @@ void SquadBoard::Update()
 
 void SquadBoard::PushMember(baseObj* nObj)
 {
+	SMember.push_back(nObj);
+}
 
+Commander::Commander()
+{
+	MessageBoardGlobal* mb=MessageBoardGlobal::GetInstance();
+	for(vector<MessageStruc*>::iterator it=mb->messageList.begin();it!=mb->messageList.end();)
+	{
+		MessageStruc* temp=*it;
+		if(temp->m_Type==REPORT)
+		{
+			//process reports
+			switch(temp->m_Content)
+			{
+			case HIGH_DANGER:
+				if((*it)->active)
+				{
+					for(vector<SquadBoard*>::iterator it2=squadList.begin();it2!=squadList.end();)
+					{
+						baseObj* temp2=(baseObj*)temp->info;
+						if((*it2)->SLeader==temp2)
+						{
+							(*it2)->SLeader->m_currentOrders->active=false;
+							MessageStruc* temp=new MessageStruc;
+							temp->active=true;
+							temp->taken=true;
+							temp->general=false;
+							temp->m_Type=ORDER;
+							temp->m_Content=RETREAT;
+							temp->priority=500;
+							mb->SendMessage1(temp);
+							(*it2)->SLeader->m_currentOrders=temp;
+							(*it)->active=false;//tell messageboard this is not needed anymore
+						}
+					}
+				}
+				break;
+			case MEDIUM_DANGER:
+				{
+					if((*it)->active)
+					{
+						MessageStruc* temp=new MessageStruc;
+						temp->active=true;
+						temp->taken=false;
+						temp->general=false;
+						temp->m_Type=ORDER;
+						temp->m_Content=ATTACKHERE;
+						temp->priority=60;
+						temp->info=temp->info;
+						mb->SendMessage1(temp);
+						(*it)->active=false;
+					}
+				}
+				break;
+			default:
+			}
+		}
+		++it;
+	}
+
+}
+
+Commander::~Commander()
+{
+
+}
+
+void Commander::ProcessReports()
+{
+
+}
+
+void Commander::Update()
+{
+	ProcessReports();
+
+	//send/update orders
+	//if there are enemy squads send attack here move priority on enemy squads i.e 50 on enemy squad vs 40 on base
+	//if there are enemy base send attack here move
+	//
 }

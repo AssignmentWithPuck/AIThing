@@ -28,7 +28,6 @@ public:
 
 private:
 	bool reqSquad;
-	MessageStruc* m_currentOrders;
 	void Shoot();
 	bool m_underFire;
 	float m_spdMilt;

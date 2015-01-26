@@ -23,6 +23,9 @@ enum MessageContent
 	RETREAT,
 	RECRUITING,
 	FINDINGSQUAD,
+	HIGH_DANGER,//tell sending squad to retreat
+	MEDIUM_DANGER,//send a squad to reinforce by an attack here move
+	DISCARD_OLD_ORDERS,
 	HEAL,
 	BUSY
 };
@@ -36,15 +39,16 @@ struct MessageStruc//probably consider changing the info to templates
 	bool taken;//to test if its being used by someone alreadys
 	objType target;//what to target not a pointer so its a general target
 	int priority;//starting priority min 0-not important, max 100-should be immediate
+	baseObj* takenBy;
 	void* info;//additional info(can be anything, such as a position,a target or nothing)
 };
 
 class MessageBoard
 {
 public:
-	virtual MessageStruc* GetMessage1(objType);
-	virtual MessageStruc* GetMessage1(objType, MessageType);
-	virtual MessageStruc* GetMessage1(MessageType);
+	virtual MessageStruc* GetMessage1(baseObj* from);
+	virtual MessageStruc* GetMessage1(baseObj* from, MessageType);
+	virtual MessageStruc* GetMessage1(objType target,MessageType,baseObj*from);
 	virtual void SendMessage1(MessageStruc*);
 	MessageBoard();
 	~MessageBoard();
@@ -87,7 +91,7 @@ public:
 	void Update();
 private:
 	void ProcessReports();
-	std::vector<MessageStruc*> orderList;//to change orders as nessasary
+	std::vector<SquadBoard*> squadList;
 };
 
 #endif
