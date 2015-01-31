@@ -45,6 +45,6 @@ public:
 	void Draw();
 	bool isDamaged();
 	bool isAlive();
-	bool reqRepair;
+
 };
 

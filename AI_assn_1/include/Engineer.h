@@ -9,17 +9,16 @@ class CEngineer : public baseObj
 public:
 	enum moveSubState
 	{
-		MOVETOLEFT = 0,
-		MOVETOMIDDLE,
-		MOVETORIGHT,
+		MOVETOTARGET = 0,
+		RETREAT,
 		MOVETORECHARGE,
 	};
 
 		enum engineerState
 	{
 		IDLE = 0,
-		REPAIR,
 		RECHARGE,
+		HEAL,
 		DAMAGED,
 		DEAD,
 	};
@@ -33,7 +32,7 @@ public:
 	
 
 private:
-	CTurret* repairTarget;
+	Soldier2* repairTarget;
 	MessageStruc* m_currentOrders;
 	void repairState();
 	void rechargeState();
@@ -53,6 +52,7 @@ public:
 	void Draw();
 	bool isAlive();
 	void bulletHit(bullet* bul);
+		
 
 };
 
