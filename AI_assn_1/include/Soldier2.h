@@ -25,6 +25,7 @@ public:
 	bool IsAlive();
 	TextureImage soldierTex;;
 	bool m_isLeader;
+	bool reqRepair;
 
 private:
 	bool reqSquad;

@@ -19,7 +19,6 @@ CTurret::CTurret(void)
 	m_state = ATTACK;
 	m_stats.ammo = 4;
 	m_stats.hp = 5;
-	reqRepair = false;
 	m_stats.timeRef=MVCTime::GetInstance()->PushNewTime(5000);
 	m_stats.bulletRef=MVCTime::GetInstance()->PushNewTime(150);
 	m_objType=TURRET_TYPE;
@@ -66,10 +65,7 @@ bool CTurret::Init()
 
 void CTurret::SwitchState()
 {
-	if(m_stats.hp >= 5){
-		reqRepair = false;
-	}
-
+	
 	switch (m_state){
 
 	case RELOAD:
@@ -122,7 +118,6 @@ void CTurret::SwitchState()
 
 	case DAMAGED:
 		--m_stats.hp;
-		reqRepair = true;
 		if(m_stats.hp > 0){
 			m_state = ATTACK;
 		}

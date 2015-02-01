@@ -1,6 +1,6 @@
 #include "Engineer.h"
 
-#include "Turret.h"
+#include "Soldier2.h"
 
 #ifndef __VECTOR_H__
 #include <vector>
@@ -51,9 +51,9 @@ void CEngineer::SwitchState()
 	case IDLE:
 		for(vector<baseObj*>::iterator it=ObjHandle::GetInstance()->m_AIList.begin();it!=ObjHandle::GetInstance()->m_AIList.end();++it)
 		{
-			if((*it)->m_objType==TURRET_TYPE)
+			if((*it)->m_objType==SOLDIER_TYPE)
 			{
-				CTurret* temp=(CTurret*)(*it);
+				Soldier2* temp=(Soldier2*)(*it);
 				if(temp->reqRepair)
 				{
 					if(repairTarget!=NULL)
@@ -73,9 +73,9 @@ void CEngineer::SwitchState()
 			}
 		}
 		if(repairTarget!=NULL && HEAL)
-			m_state = REPAIR;
+			m_state = HEAL;
 		break;
-	case REPAIR:
+	case HEAL:
 		if (m_stats.charge <= 0){
 			m_state = RECHARGE;
 		}
@@ -85,7 +85,7 @@ void CEngineer::SwitchState()
 		if (m_stats.hp > 0){
 			if (m_stats.charge > 0){
 				if (repairTarget != NULL)
-					m_state = REPAIR;
+					m_state = HEAL;
 				else
 					m_state = IDLE;
 			}
@@ -161,7 +161,7 @@ void CEngineer::Update(float delta)
 	SwitchState();
 	switch(m_state)
 	{
-	case REPAIR:
+	case HEAL:
 		if(MVCTime::GetInstance()->TestTime(m_stats.timeRef))
 		{
 			m_stats.charge--;

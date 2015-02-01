@@ -21,6 +21,7 @@ bool Soldier2::Init()
 	m_isLeader=false;
 	m_currentOrders=NULL;
 	reqSquad=false;
+	reqRepair = false;
 	squadBoard=NULL;
 	m_stats.hp=5;
 	if(!LoadTGA(&soldierTex,"Soldier.tga"))
