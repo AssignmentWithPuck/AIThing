@@ -3,6 +3,7 @@
 #include "AI_header.h"
 #include "Turret.h"
 #include "MessageBoard.h"
+#include "Soldier2.h"
 
 class CEngineer : public baseObj
 {

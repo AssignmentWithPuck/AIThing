@@ -79,8 +79,8 @@ void bullet::Draw()
 	{
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-		glBindTexture(GL_TEXTURE_2D,bulletTex.texID);
+		//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		//glBindTexture(GL_TEXTURE_2D,bulletTex.texID);
 		glPushMatrix();
 			glTranslatef(pos.m_x,pos.m_y,pos.m_z);
 			glScalef(15,15,0);
@@ -97,7 +97,7 @@ void bullet::Update(float delta)
 	if(active)
 	{
 		pos=pos+spd*delta;
-		lifeLeft-=1/delta;
+		lifeLeft-=1000*delta;
 		if(lifeLeft<=0)
 		{
 			active=false;
@@ -114,7 +114,6 @@ bullet::bullet()
 {
 	active=true;
 	lifeLeft=0;
-	type=NONE;
 	LoadTGA(&bulletTex,"bullet.tga");
 }
 
@@ -123,28 +122,29 @@ bullet::~bullet()
 
 }
 
-bullet::bullet(int life,Vector3D pos,Vector3D spd,source type)
+bullet::bullet(int life,Vector3D pos,Vector3D spd,int type)
 {
 	lifeLeft=life;
 	this->pos=pos;
 	this->spd=spd;
-	this->type=type;
+	this->side=type;
 	this->active=true;
+	this->m_objType=BULLET;
 	LoadTGA(&bulletTex,"bullet.tga");
 
 }
 
-void bullet::Set(int life,Vector3D pos,Vector3D spd,Vector3D scale,source type)
+void bullet::Set(int life,Vector3D pos,Vector3D spd,Vector3D scale,int type)
 {
 	lifeLeft=life;
 	this->pos=pos;
 	this->spd=spd;
-	this->type=type;
+	this->side=type;
 	this->scale=scale;
 	this->active=true;
 }
 
-bullet* ObjHandle::GetBullet(int life,Vector3D pos,Vector3D spd,source type)
+bullet* ObjHandle::GetBullet(int life,Vector3D pos,Vector3D spd,int type)
 {
 	m_bulletList.size();
 	for(vector<bullet*>::iterator it=m_bulletList.begin();it!=m_bulletList.end();++it)
@@ -237,12 +237,19 @@ void ObjHandle::Update(float delta)
 		}
 		else
 		{
-			delete (*it);
-			it=m_objList.erase(it);
-			continue;
+			if((*it)->m_objType!=BULLET)
+			{
+				delete (*it);
+				it=m_objList.erase(it);
+				continue;
+			}
+			//delete (*it);
+			//it=m_objList.erase(it);
+			//continue;
 		}
 		++it;
 	}
+
 	accessing=false;
 	if(addedStuff)
 	{
@@ -257,7 +264,7 @@ void ObjHandle::Update(float delta)
 		addedStuff=false;
 	}
 	//test collision)
-	for(vector<baseObj*>::iterator it=m_AIList.begin();it!=m_AIList.end();++it)
+	for(vector<baseObj*>::iterator it=m_AIList.begin();it!=m_AIList.end();)
 	{
 		if((*it)->GetActive())
 		{
@@ -266,9 +273,29 @@ void ObjHandle::Update(float delta)
 				if((*it2)->GetActive())//test bullet
 				{
 					//test orgin of the bullet against the colided object
+					if((*it2)->side!=(*it)->side)
+					{
+						if(((*it)->GetPos()-(*it2)->GetPos()).GetMagnitudeSquare()<225)
+						{
+							switch((*it)->m_objType)
+							{
+							case SOLDIER_TYPE:
+							case LEADER_TYPE:
+								Soldier2* temp=(Soldier2*)(*it);
+								temp->bulletHit(*it2);
+								break;
+							}
+						}
+					}
 				}
 			}
 		}
+		else
+		{
+			it=m_AIList.erase(it);
+			continue;
+		}
+		++it;
 	}
 }
 
@@ -283,9 +310,8 @@ void ObjHandle::Draw(void (*Printw)(float x, float y,const char* format, ...))
 			switch((*it)->m_objType)
 			{
 			case SOLDIER_TYPE:
-			case NOSQUAD_TYPE:
 				{
-					Soldier2* temp=(Soldier2*)(*it);
+					/*Soldier2* temp=(Soldier2*)(*it);
 					Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-40,"Current HP");
 					glPushMatrix();
 						glTranslatef(temp->GetPos().m_x+100+temp->m_stats.hp*5,temp->GetPos().m_y-47,0);
@@ -308,9 +334,18 @@ void ObjHandle::Draw(void (*Printw)(float x, float y,const char* format, ...))
 							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Last message: LEADER DOWN");
 							break;
 						}
-					}
+					}*/
 				}
 			}
+			if((*it)->side==0)
+			{
+				//glColor3f(1,0,1);
+			}
+			else
+			{
+				//glColor3f(0,1,1);
+			}
+
 			(*it)->Draw();
 		}
 	}
@@ -353,7 +388,7 @@ ObjHandle::ObjHandle()
 }
 
 
-int ObjHandle::BulletsInProx(source src,Vector3D pos,float dist)
+int ObjHandle::BulletsInProx(int src,Vector3D pos,float dist)
 {
 	int counter=0;
 	for(vector<bullet*>::iterator it=m_bulletList.begin();it!=m_bulletList.end();++it)
@@ -361,7 +396,7 @@ int ObjHandle::BulletsInProx(source src,Vector3D pos,float dist)
 		bullet* temp= *it;
 		if(temp->GetActive())
 		{
-			if(temp->type==src)
+			if(temp->side!=src)
 			{
 				if((pos-temp->GetPos()).GetMagnitudeSquare()<dist*dist)
 				{
@@ -371,4 +406,42 @@ int ObjHandle::BulletsInProx(source src,Vector3D pos,float dist)
 		}
 	}
 	return counter;
+}
+
+int ObjHandle::EnemyinProx(int mySide,Vector3D pos,float dist)
+{
+	int counter=0;
+	for(vector<baseObj*>::iterator it=m_AIList.begin();it!=m_AIList.end();++it)
+	{
+		baseObj* temp= *it;
+		if(temp->GetActive())
+		{
+			if(temp->side!=mySide)
+			{
+				if((pos-temp->GetPos()).GetMagnitudeSquare()<dist*dist)
+				{
+					counter++;
+				}
+			}
+		}
+	}
+	return counter;
+}
+
+Vector3D* ObjHandle::EnemytoShoot(int mySide,Vector3D pos,float dist)
+{
+	for(vector<baseObj*>::iterator it=m_AIList.begin();it!=m_AIList.end();++it)
+	{
+		baseObj* temp= *it;
+		if(temp->GetActive())
+		{
+			if(temp->side!=mySide)
+			{
+				if((pos-temp->GetPos()).GetMagnitudeSquare()<dist*dist)
+				{
+					return &temp->pos;
+				}
+			}
+		}
+	}
 }

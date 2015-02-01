@@ -9,6 +9,7 @@
 #include <vector>
 #define __VECTOR_H__
 #endif
+#include "AI_header.h"
 
 enum MessageType
 {
@@ -41,6 +42,11 @@ struct MessageStruc//probably consider changing the info to templates
 	int priority;//starting priority min 0-not important, max 100-should be immediate
 	baseObj* takenBy;
 	void* info;//additional info(can be anything, such as a position,a target or nothing)
+	MessageStruc()
+	{
+		info=NULL;
+		takenBy=NULL;
+	}
 };
 
 class MessageBoard
@@ -76,13 +82,16 @@ public:
 	SquadBoard();
 	~SquadBoard();
 	bool active;
+	Vector3D SquadColor;
 	void Update();
 	std::vector<MessageStruc*> sentMessages;
 	void PushMember(baseObj*);
 	baseObj* SLeader;
 	int side;
+	Vector3D* pos;
 	std::vector<baseObj*> SMember;
 	bool full;
+	bool sentOrders;
 };
 
 class Commander
@@ -94,6 +103,11 @@ public:
 	Commander* otherCommander;
 	std::vector<SquadBoard*> squadList;
 	int side;
+	Vector3D pos;
+	int timeRef;
+	bool Init();
+	Vector3D fixedAttackPos[5];//for the fixed attack positions
+	ObjHandle* spawn;//to spawn the soldiers
 private:
 	void ProcessReports();
 };

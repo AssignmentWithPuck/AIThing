@@ -32,6 +32,7 @@ public:
 	bool InitPhase2(void);//init after view's init e.g Textures,stuff requiring screen size
 	
 	Commander* m_commander;
+	Commander* m_commander2;//other commander for the other side
 
 	float m_worldSizeX;
 	float m_worldSizeY;

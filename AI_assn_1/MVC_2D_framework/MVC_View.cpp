@@ -68,17 +68,18 @@ BOOL MVC_View::Draw(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
 	glLoadIdentity(); // ReSet The Current Modelview Matrix
 	glEnable(GL_TEXTURE_2D);
-	glColor3f(1,1,1);
-	Printw(5,30,"FPS: %.2f",MVCTime::GetInstance()->GetFPS());
+	
 	glPushMatrix();
 	glBindTexture(GL_TEXTURE_2D,m_theModel->background.texID);
 		glTranslatef(this->m_iWindows_Width*0.5,this->m_iWindows_Height*0.5,0);
 		glScalef(this->m_iWindows_Width,this->m_iWindows_Height,0);
 		basicShape::drawSquare();
 	glPopMatrix();	
-	void* (*thePrintFunc)(float x, float y,const char* format, ...);
+	
 	ObjHandle::GetInstance()->Draw(Printw);
 	
+	glColor3f(1,1,1);
+	Printw(5,30,"FPS: %.2f",MVCTime::GetInstance()->GetFPS());
 	glColor3f(1,1,1);
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1,1,1);

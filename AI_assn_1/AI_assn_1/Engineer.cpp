@@ -1,7 +1,5 @@
 #include "Engineer.h"
 
-#include "Soldier2.h"
-
 #ifndef __VECTOR_H__
 #include <vector>
 #endif;
@@ -150,7 +148,7 @@ void CEngineer::Update(float delta)
 						{
 						case HEAL:
 							{
-								
+								//!!!!!!??????
 							}
 							break;
 						}

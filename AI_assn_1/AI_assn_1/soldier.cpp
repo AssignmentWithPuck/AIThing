@@ -58,7 +58,6 @@ void SoldierSMControl::SwitchState()
 			int i=ObjHandle::GetInstance()->BulletsInProx(TURRET,pos,100.0f);
 			UnderFire(i);
 		}
-
 		if(m_stats.reloading&&m_stats.ammo<7)
 		{
 			if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))

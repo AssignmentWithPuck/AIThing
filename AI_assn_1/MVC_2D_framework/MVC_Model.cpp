@@ -27,6 +27,19 @@ bool MVC_Model::Init(float fpsLimit)
 	m_timer->Init(true,int(fpsLimit));
 	m_commander=new Commander;
 	m_commander->side=0;
+	m_commander->pos=Vector3D(150,400,0);
+	m_commander2=new Commander;
+	m_commander2->side=1;
+	m_commander2->pos=Vector3D(800,400,0);
+	m_commander->otherCommander=m_commander2;
+	m_commander2->otherCommander=m_commander;
+	m_commander->spawn=m_commander2->spawn=ObjHandle::GetInstance();
+	m_commander->fixedAttackPos[0]=m_commander2->fixedAttackPos[0]=Vector3D(500,50,0);
+	m_commander->fixedAttackPos[1]=m_commander2->fixedAttackPos[1]=Vector3D(500,300,0);
+	m_commander->fixedAttackPos[2]=m_commander2->fixedAttackPos[2]=Vector3D(500,550,0);
+	m_commander->fixedAttackPos[3]=m_commander2->fixedAttackPos[3]=Vector3D(500,800,0);
+	m_commander->fixedAttackPos[4]=m_commander2->pos;
+	m_commander2->fixedAttackPos[4]=m_commander->pos;
 	return true;
 }
 
@@ -46,18 +59,10 @@ void MVC_Model::Update(void)
 	{
 		if(m_timer->TestFramerate())//update control
 		{
-			ProcMessages();
 			ObjHandle::GetInstance()->Update(m_timer->GetDelta());
 
 			m_commander->Update();
-			
-			//thing.SwitchState();
-			//thing2.SwitchState();
-			//eng.SwitchState();
-
-			//thing.Update(m_timer->GetDelta());
-			//thing2.Update(m_timer->GetDelta());
-			//eng.Update(m_timer->GetDelta());
+			m_commander2->Update();
 		}
 	}
 	else

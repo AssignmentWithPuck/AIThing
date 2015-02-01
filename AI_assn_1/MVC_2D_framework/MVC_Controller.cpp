@@ -45,7 +45,7 @@ bool MVC_Controller::Init(void)
 {
 
 
-	if(!m_theModel->Init(30))
+	if(!m_theModel->Init(1000))
 		return false;
 
 	return true;

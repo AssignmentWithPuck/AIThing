@@ -41,12 +41,18 @@ enum objType
 	ENGINEER_TYPE,
 	LEADER_TYPE,
 	NOSQUAD_TYPE,
-	SQUAD_TYPE
+	SQUAD_TYPE,
+	BULLET
 };
 
 struct stats2
 {
 	int hp;
+	int ammo;
+	int timeRef;//for misc operations
+	int bulletRef;//for reloading and shooting
+	bool reloading;
+	bool proning;
 };
 struct node
 {
@@ -72,13 +78,12 @@ public:
 	baseObj();
 	~baseObj();
 	objType m_objType;
-	//move to protected after done testing
 	SquadBoard* squadBoard;
 	MessageStruc* m_currentOrders;
 	int side;//determines which side the obj is in
+	Vector3D pos,spd;
 protected:
 	bool active;
-	Vector3D pos,spd;
 	Vector3D scale;
 };
 
@@ -88,12 +93,11 @@ public:
 	bool Init();
 	int lifeLeft;
 	TextureImage bulletTex;
-	source type;
 	void Update(float delta);
 	void Draw();
-	void Set(int life,Vector3D pos,Vector3D spd,Vector3D scale,source type);
+	void Set(int life,Vector3D pos,Vector3D spd,Vector3D scale,int type);
 	bullet();
-	bullet(int life,Vector3D pos,Vector3D spd,source type);
+	bullet(int life,Vector3D pos,Vector3D spd,int type);
 	~bullet();
 };
 
@@ -101,13 +105,18 @@ class ObjHandle
 {
 public:
 	static ObjHandle* GetInstance();
-	bullet* GetBullet(int life,Vector3D pos,Vector3D spd,source type);
+	bullet* GetBullet(int life,Vector3D pos,Vector3D spd,int side);
 	void Update(float delta);
 	void PushObj(objType type,Vector3D pos,int side);
-	int BulletsInProx(source src,Vector3D pos,float dist);
+
+	int BulletsInProx(int mySide,Vector3D pos,float dist);
+	Vector3D* EnemytoShoot(int mySide,Vector3D pos,float dist);//finds an enemy to shoot around the pos dist away
+	int EnemyinProx(int mySide,Vector3D pos,float dist);//finds number of enemies around a pos dist away
+
 	void Draw(void (*Printw)(float x, float y,const char* format, ...));// function pointer to print on screen function
 	static void Drop();
-	std::vector<baseObj*> m_AIList;
+
+	std::vector<baseObj*> m_AIList;// for each side
 private:
 	bool addedStuff;
 	bool accessing;
