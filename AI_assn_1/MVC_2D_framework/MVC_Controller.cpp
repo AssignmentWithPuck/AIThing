@@ -187,12 +187,11 @@ void MVC_Controller::ProcKeyboard()
 	}
 	if(temp['A'])
 	{
-		ObjHandle::GetInstance()->PushObj(SOLDIER_TYPE,Vector3D(rand()%400+50,rand()%400+50,0));
+		ObjHandle::GetInstance()->PushObj(SOLDIER_TYPE,Vector3D(rand()%400+50,rand()%400+50,0),0);
 		temp['A']=false;
 	}
 	if(temp['D'])
 	{
-		m_theModel->theSquad.SLeader->m_stats.hp=0;
 		temp['D']=false;
 	}
 	if(temp['S'])
@@ -200,7 +199,10 @@ void MVC_Controller::ProcKeyboard()
 		for(vector<MessageStruc*>::iterator it=m_theModel->theSquad.sentMessages.begin();it!=m_theModel->theSquad.sentMessages.end();++it)
 		{
 			if((*it)->m_Content==RECRUITING);
-			(*it)->taken=!(*it)->taken;
+			{
+				(*it)->taken=!(*it)->taken;
+				m_theModel->theSquad.full=!m_theModel->theSquad.full;
+			}
 		}
 		temp['S']=false;
 	}

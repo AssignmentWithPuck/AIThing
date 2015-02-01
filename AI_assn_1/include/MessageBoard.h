@@ -22,9 +22,9 @@ enum MessageContent
 	LEADERDOWN,
 	RETREAT,
 	RECRUITING,
-	FINDINGSQUAD,
-	HIGH_DANGER,//tell sending squad to retreat
-	MEDIUM_DANGER,//send a squad to reinforce by an attack here move
+	FINDINGSQUAD,//report
+	HIGH_DANGER,//report tell sending squad to retreat
+	MEDIUM_DANGER,//report send a squad to reinforce by an attack here move
 	DISCARD_OLD_ORDERS,
 	HEAL,
 	BUSY
@@ -60,7 +60,7 @@ protected:
 class MessageBoardGlobal:public MessageBoard//communication between squads
 {
 public:
-	static MessageBoardGlobal* GetInstance();
+	static MessageBoardGlobal* GetInstance(int i);
 	static void Drop();
 private:
 	static MessageBoardGlobal* s_instance;
@@ -80,7 +80,9 @@ public:
 	std::vector<MessageStruc*> sentMessages;
 	void PushMember(baseObj*);
 	baseObj* SLeader;
+	int side;
 	std::vector<baseObj*> SMember;
+	bool full;
 };
 
 class Commander
@@ -89,9 +91,11 @@ public:
 	Commander();
 	~Commander();
 	void Update();
+	Commander* otherCommander;
+	std::vector<SquadBoard*> squadList;
+	int side;
 private:
 	void ProcessReports();
-	std::vector<SquadBoard*> squadList;
 };
 
 #endif

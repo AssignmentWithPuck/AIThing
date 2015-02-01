@@ -75,6 +75,7 @@ public:
 	//move to protected after done testing
 	SquadBoard* squadBoard;
 	MessageStruc* m_currentOrders;
+	int side;//determines which side the obj is in
 protected:
 	bool active;
 	Vector3D pos,spd;
@@ -102,9 +103,9 @@ public:
 	static ObjHandle* GetInstance();
 	bullet* GetBullet(int life,Vector3D pos,Vector3D spd,source type);
 	void Update(float delta);
-	void PushObj(objType type,Vector3D pos);
+	void PushObj(objType type,Vector3D pos,int side);
 	int BulletsInProx(source src,Vector3D pos,float dist);
-	void Draw();
+	void Draw(void (*Printw)(float x, float y,const char* format, ...));// function pointer to print on screen function
 	static void Drop();
 	std::vector<baseObj*> m_AIList;
 private:

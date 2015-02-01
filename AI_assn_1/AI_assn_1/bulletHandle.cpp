@@ -173,7 +173,7 @@ bullet* ObjHandle::GetBullet(int life,Vector3D pos,Vector3D spd,source type)
 	return temp;
 }
 
-void ObjHandle::PushObj(objType type,Vector3D pos)
+void ObjHandle::PushObj(objType type,Vector3D pos,int side)
 {
 	switch(type)
 	{
@@ -182,6 +182,7 @@ void ObjHandle::PushObj(objType type,Vector3D pos)
 			Soldier2* temp=new Soldier2;
 			temp->Init();
 			temp->SetPos(pos);
+			temp->side=side;
 			m_AIList.push_back(temp);
 				m_objList.push_back(temp);
 		}
@@ -191,6 +192,7 @@ void ObjHandle::PushObj(objType type,Vector3D pos)
 			CEngineer* temp=new CEngineer;
 			temp->Init();
 			temp->SetPos(pos);
+			temp->side=side;
 			m_AIList.push_back(temp);
 			if(accessing)
 			{
@@ -207,6 +209,7 @@ void ObjHandle::PushObj(objType type,Vector3D pos)
 			temp->Init();
 			temp->SetPos(pos);
 			m_AIList.push_back(temp);
+			temp->side=side;
 			if(accessing)
 			{
 				addedStuff=true;
@@ -222,7 +225,7 @@ void ObjHandle::PushObj(objType type,Vector3D pos)
 void ObjHandle::Update(float delta)
 {
 	accessing=true;
-	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
+	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();)
 	{
 		if((*it)==NULL)
 		{
@@ -232,6 +235,13 @@ void ObjHandle::Update(float delta)
 		{
 			(*it)->Update(delta);
 		}
+		else
+		{
+			delete (*it);
+			it=m_objList.erase(it);
+			continue;
+		}
+		++it;
 	}
 	accessing=false;
 	if(addedStuff)
@@ -262,7 +272,7 @@ void ObjHandle::Update(float delta)
 	}
 }
 
-void ObjHandle::Draw(void)
+void ObjHandle::Draw(void (*Printw)(float x, float y,const char* format, ...))
 {
 	accessing=true;
 	for(vector<baseObj*>::iterator it=m_objList.begin();it!=m_objList.end();++it)
@@ -270,6 +280,37 @@ void ObjHandle::Draw(void)
 		if((*it)->GetActive())
 		{
 		//draw here;
+			switch((*it)->m_objType)
+			{
+			case SOLDIER_TYPE:
+			case NOSQUAD_TYPE:
+				{
+					Soldier2* temp=(Soldier2*)(*it);
+					Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-40,"Current HP");
+					glPushMatrix();
+						glTranslatef(temp->GetPos().m_x+100+temp->m_stats.hp*5,temp->GetPos().m_y-47,0);
+						glScalef(temp->m_stats.hp*10,15,0);
+						glBindTexture(GL_TEXTURE_2D,NULL);
+						basicShape::drawCube();
+					glPopMatrix();
+					if(temp->m_currentOrders==NULL)
+					{
+						Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Last message: NO ORDERS");
+					}
+					else
+					{
+						switch(temp->m_currentOrders->m_Content)
+						{
+						case ATTACKHERE:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Last message: ATTACK HERE");
+							break;
+						case LEADERDOWN:
+							Printw(temp->GetPos().m_x-25,temp->GetPos().m_y-25,"Last message: LEADER DOWN");
+							break;
+						}
+					}
+				}
+			}
 			(*it)->Draw();
 		}
 	}

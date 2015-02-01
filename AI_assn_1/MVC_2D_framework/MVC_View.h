@@ -38,8 +38,8 @@ public:
 	CMouse m_MouseInfo;
 	float m_Swidth,m_Sheight;
 private:
-	GLuint  m_base;                           // Base Display List For The Font Set
-	void Printw (float x, float y,const char* format, ...);
+	static GLuint  m_base;                           // Base Display List For The Font Set
+	static void Printw (float x, float y,const char* format, ...);
 
 	MVC_Model* m_theModel;
 

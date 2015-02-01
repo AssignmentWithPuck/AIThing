@@ -19,11 +19,14 @@ MVC_Model::MVC_Model(void)
 
 MVC_Model::~MVC_Model(void)
 {
+	delete m_commander;
 }
 
 bool MVC_Model::Init(float fpsLimit)
 {
 	m_timer->Init(true,int(fpsLimit));
+	m_commander=new Commander;
+	m_commander->side=0;
 	return true;
 }
 
@@ -32,7 +35,6 @@ bool MVC_Model::InitPhase2(void)
 	LoadTGA(&background,"grassland.tga");
 	pause=false;
 	timeHolder=m_timer->PushNewTime(3000);
-	theSquad.Update();
 	return true;
 }
 
@@ -47,6 +49,8 @@ void MVC_Model::Update(void)
 			ProcMessages();
 			ObjHandle::GetInstance()->Update(m_timer->GetDelta());
 
+			m_commander->Update();
+			
 			//thing.SwitchState();
 			//thing2.SwitchState();
 			//eng.SwitchState();
@@ -68,25 +72,25 @@ void MVC_Model::Update(void)
 
 void MVC_Model::ProcMessages()
 {
-	for(vector<MessageStruc*>::iterator it=MessageBoardGlobal::GetInstance()->messageList.begin();it!=MessageBoardGlobal::GetInstance()->messageList.end();++it)
-	{//goes through all messages
-		if((*it)->m_Type==REPORT)
-		{
-			if((*it)->m_Content==FINDINGSQUAD&&(*it)->active)
-			{
-				for(vector<MessageStruc*>::iterator it2=MessageBoardGlobal::GetInstance()->messageList.begin();it2!=MessageBoardGlobal::GetInstance()->messageList.end();++it2)
-				{
-					if((*it2)->active&&(*it2)->m_Content==RECRUITING&&!(*it2)->taken)
-					{
-						baseObj* temp = (baseObj*)(*it)->info;
-						theSquad.SMember.push_back(temp);
-						temp->squadBoard=&theSquad;
-						temp->m_objType=SOLDIER_TYPE;
-						(*it)->active=false;
-						break;
-					}
-				}
-			}
-		}
-	}
+	//for(vector<MessageStruc*>::iterator it=MessageBoardGlobal::GetInstance(side)->messageList.begin();it!=MessageBoardGlobal::GetInstance()->messageList.end();++it)
+	//{//goes through all messages
+	//	if((*it)->m_Type==REPORT)
+	//	{
+	//		if((*it)->m_Content==FINDINGSQUAD&&(*it)->active)
+	//		{
+	//			for(vector<MessageStruc*>::iterator it2=MessageBoardGlobal::GetInstance()->messageList.begin();it2!=MessageBoardGlobal::GetInstance()->messageList.end();++it2)
+	//			{
+	//				if((*it2)->active&&(*it2)->m_Content==RECRUITING&&!(*it2)->taken)
+	//				{
+	//					baseObj* temp = (baseObj*)(*it)->info;
+	//					theSquad.SMember.push_back(temp);
+	//					temp->squadBoard=&theSquad;
+	//					temp->m_objType=SOLDIER_TYPE;
+	//					(*it)->active=false;
+	//					break;
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 }

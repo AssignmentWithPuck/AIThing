@@ -76,7 +76,8 @@ BOOL MVC_View::Draw(void)
 		glScalef(this->m_iWindows_Width,this->m_iWindows_Height,0);
 		basicShape::drawSquare();
 	glPopMatrix();	
-	ObjHandle::GetInstance()->Draw();
+	void* (*thePrintFunc)(float x, float y,const char* format, ...);
+	ObjHandle::GetInstance()->Draw(Printw);
 	
 	glColor3f(1,1,1);
 	glDisable(GL_TEXTURE_2D);
@@ -100,3 +101,4 @@ int MVC_View::InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 	return TRUE; // Initialization Went OK
 }
 
+unsigned MVC_View::m_base=0;

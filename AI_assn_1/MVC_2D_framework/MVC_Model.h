@@ -31,6 +31,8 @@ public:
 	bool Init(float fpsLimit);
 	bool InitPhase2(void);//init after view's init e.g Textures,stuff requiring screen size
 	
+	Commander* m_commander;
+
 	float m_worldSizeX;
 	float m_worldSizeY;
 

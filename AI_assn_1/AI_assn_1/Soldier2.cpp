@@ -4,6 +4,8 @@
 #include "basicShape.h"
 #endif
 
+using namespace std;
+
 Soldier2::Soldier2(void)
 {
 }
@@ -80,7 +82,7 @@ void Soldier2::Draw()
 				else
 					glRotatef(atan(spd.m_y/spd.m_x)/3.142*180,0,0,1);
 			}*/
-			glScalef(50,50,0);
+			glScalef(25,25,25);
 			basicShape::drawSquare();
 		glPopMatrix();
 
@@ -101,12 +103,13 @@ void Soldier2::Update(float delta)
 	{
 		if(m_isLeader)
 		{
-			MessageBoardGlobal* messageBoardG=MessageBoardGlobal::GetInstance();
+			MessageBoardGlobal* messageBoardG=MessageBoardGlobal::GetInstance(side);
 			if(m_currentOrders==NULL)
 			{
 				m_currentOrders=messageBoardG->GetMessage1(SQUAD_TYPE,ORDER,this);
-				if(m_currentOrders->general==false)
-					m_currentOrders->taken=true;
+				if(m_currentOrders!=NULL)
+					if(m_currentOrders->general==false)
+						m_currentOrders->taken=true;
 			}
 			else
 			{
@@ -195,7 +198,35 @@ void Soldier2::Update(float delta)
 						}
 					}
 				}
-				//else do nothing
+				else if(true)//testing for near base
+				{
+					if(squadBoard->SMember.size()<10)
+					{
+						bool send=true;
+						for(vector<MessageStruc*>::iterator it=squadBoard->sentMessages.begin();it!=squadBoard->sentMessages.end();)
+						{
+							if((*it)->m_Content==RECRUITING)
+							{
+								send=false;
+								break;
+							}
+						}
+						if(send)
+						{
+							MessageStruc* temp=new MessageStruc;
+							temp->active=true;
+							temp->taken=false;
+							temp->general=true;
+							temp->m_Type=REPORT;
+							temp->m_Content=RECRUITING;
+							temp->target=objType::NOSQUAD_TYPE;
+							temp->priority=50;
+							temp->info=squadBoard;
+							MessageBoardGlobal::GetInstance(side)->SendMessage1(temp);
+							squadBoard->sentMessages.push_back(temp);
+						}
+					}
+				}
 			}
 			
 		}
@@ -205,7 +236,7 @@ void Soldier2::Update(float delta)
 			{
 				if(m_currentOrders==NULL)
 				{
-					m_currentOrders=squadBoard->GetMessage1(this,ORDER);
+					m_currentOrders=this->squadBoard->GetMessage1(this,ORDER);
 					if(m_currentOrders!=NULL)
 						if(m_currentOrders->general==false)
 						{
@@ -241,6 +272,7 @@ void Soldier2::Update(float delta)
 							m_currentOrders->active=false;
 							m_isLeader=true;
 							squadBoard->SLeader=this;//this is to set the leader in the squadboard
+							m_currentOrders=NULL;
 							break;
 						case ATTACKHERE:
 							{
@@ -271,8 +303,7 @@ void Soldier2::Update(float delta)
 					temp->m_Content=FINDINGSQUAD;
 					temp->priority=50;
 					temp->info=this;
-
-					MessageBoardGlobal::GetInstance()->SendMessage1(temp);
+					MessageBoardGlobal::GetInstance(side)->SendMessage1(temp);
 					reqSquad=true;
 				}
 			}
