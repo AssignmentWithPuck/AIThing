@@ -22,11 +22,9 @@ enum MessageContent
 	ATTACKHERE,
 	LEADERDOWN,
 	RETREAT,
-	RECRUITING,
 	FINDINGSQUAD,//report
-	HIGH_DANGER,//report tell sending squad to retreat
-	MEDIUM_DANGER,//report send a squad to reinforce by an attack here move
-	DISCARD_OLD_ORDERS,
+	RECRUITING,
+
 	HEAL,
 	BUSY
 };

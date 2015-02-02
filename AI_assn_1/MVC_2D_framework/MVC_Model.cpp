@@ -40,6 +40,8 @@ bool MVC_Model::Init(float fpsLimit)
 	m_commander->fixedAttackPos[3]=m_commander2->fixedAttackPos[3]=Vector3D(500,800,0);
 	m_commander->fixedAttackPos[4]=m_commander2->pos;
 	m_commander2->fixedAttackPos[4]=m_commander->pos;
+	m_commander->Init();
+	m_commander2->Init();
 	return true;
 }
 

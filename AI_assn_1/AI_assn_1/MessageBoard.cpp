@@ -158,7 +158,7 @@ void SquadBoard::Update()
 	{
 		int go=false;
 		bool stopRecruit=false;
-		if(SMember.size()>9)
+		if(SMember.size()>5)
 			stopRecruit=true;
 		for(vector<MessageStruc*>::iterator it=messageList.end();it!=messageList.end();)
 		{
@@ -274,7 +274,21 @@ Commander::Commander()
 
 bool Commander::Init()
 {
-
+	
+	for(int i=0;i<5;i++)
+	{
+			MessageStruc* temp=new MessageStruc;
+			temp->active=true;
+			temp->taken=false;
+			temp->general=false;
+			temp->m_Type=ORDER;
+			temp->m_Content=ATTACKHERE;
+			temp->target=objType::SQUAD_TYPE;
+			temp->priority=30+rand()%40;
+			temp->info=&fixedAttackPos[i];
+			MessageBoardGlobal::GetInstance(side)->SendMessage1(temp);
+			//send attack order
+	}
 	return true;
 }
 
@@ -294,50 +308,50 @@ void Commander::ProcessReports()
 			//process reports
 			switch(temp->m_Content)
 			{
-			case HIGH_DANGER:
-				if((*it)->active)
-				{
-					for(vector<SquadBoard*>::iterator it2=squadList.begin();it2!=squadList.end();)
-					{
-						baseObj* temp2=(baseObj*)temp->info;
-						if((*it2)->SLeader==temp2)
-						{
-							(*it2)->SLeader->m_currentOrders->active=false;
-							MessageStruc* temp=new MessageStruc;
-							temp->active=true;
-							temp->taken=true;
-							temp->general=false;
-							temp->m_Type=ORDER;
-							temp->m_Content=RETREAT;
-							temp->priority=500;
-							mb->SendMessage1(temp);
-							(*it2)->SLeader->m_currentOrders=temp;
-							(*it)->active=false;//tell messageboard this is not needed anymore
-						}
-					}
-				}
-				break;
-			case MEDIUM_DANGER:
-				{
-					if((*it)->active)
-					{
-						MessageStruc* temp=new MessageStruc;
-						temp->active=true;
-						temp->taken=false;
-						temp->general=false;
-						temp->m_Type=ORDER;
-						temp->m_Content=ATTACKHERE;
-						temp->priority=60;
-						temp->info=(*it)->info;
-						mb->SendMessage1(temp);
-						(*it)->active=false;
-					}
-				}
-				break;
+			//case HIGH_DANGER:
+			//	if((*it)->active)
+			//	{
+			//		for(vector<SquadBoard*>::iterator it2=squadList.begin();it2!=squadList.end();)
+			//		{
+			//			baseObj* temp2=(baseObj*)temp->info;
+			//			if((*it2)->SLeader==temp2)
+			//			{
+			//				(*it2)->SLeader->m_currentOrders->active=false;
+			//				MessageStruc* temp=new MessageStruc;
+			//				temp->active=true;
+			//				temp->taken=true;
+			//				temp->general=false;
+			//				temp->m_Type=ORDER;
+			//				temp->m_Content=RETREAT;
+			//				temp->priority=500;
+			//				mb->SendMessage1(temp);
+			//				(*it2)->SLeader->m_currentOrders=temp;
+			//				(*it)->active=false;//tell messageboard this is not needed anymore
+			//			}
+			//		}
+			//	}
+			//	break;
+			//case MEDIUM_DANGER:
+			//	{
+			//		if((*it)->active)
+			//		{
+			//			MessageStruc* temp=new MessageStruc;
+			//			temp->active=true;
+			//			temp->taken=false;
+			//			temp->general=false;
+			//			temp->m_Type=ORDER;
+			//			temp->m_Content=ATTACKHERE;
+			//			temp->priority=60;
+			//			temp->info=(*it)->info;
+			//			mb->SendMessage1(temp);
+			//			(*it)->active=false;
+			//		}
+			//	}
+			//	break;
 			case FINDINGSQUAD:
 				{
 					bool move=false;
-					SquadBoard* theSquad;
+					SquadBoard* theSquad=NULL;
 					for(vector<MessageStruc*>::iterator it2=mb->messageList.begin();it2!=mb->messageList.end();++it2)
 					{
 						if((*it2)->active&&(*it2)->m_Content==RECRUITING&&!(*it2)->taken)//cycle through all messages again to look for recruiting
@@ -349,17 +363,23 @@ void Commander::ProcessReports()
 					}
 					if(!move)//means no squad is looking for a member so create a new squad to put this fella in
 					{
-						theSquad=new SquadBoard;
-						theSquad->side=side;
-						squadList.push_back(theSquad);
+						if(squadList.size()<1)
+						{
+							theSquad=new SquadBoard;
+							theSquad->side=side;
+							squadList.push_back(theSquad);
+						}
 					}
-					baseObj* temp = (baseObj*)(*it)->info;
-					theSquad->SMember.push_back(temp);
-					temp->squadBoard=theSquad;
-					//below is a questionable line
-					temp->m_objType=SOLDIER_TYPE;
-					it=mb->messageList.erase(it);
-					continue;
+					if(theSquad!=NULL)
+					{
+						baseObj* temp = (baseObj*)(*it)->info;
+						theSquad->SMember.push_back(temp);
+						temp->squadBoard=theSquad;
+						//below is a questionable line
+						temp->m_objType=SOLDIER_TYPE;
+						it=mb->messageList.erase(it);
+						continue;
+					}
 				}
 				break;
 			default:
@@ -377,10 +397,10 @@ void Commander::Update()
 	if(MVCTime::GetInstance()->TestTime(timeRef))
 	{
 		int total=0;
-		for(vector<SquadBoard*>::iterator it=squadList.begin();it!=squadList.end();++it)
-		{
-			total+=(*it)->SMember.size();
-		}
+		if(side==0)
+			total=ObjHandle::GetInstance()->EnemyinProx(1,Vector3D(),10000);
+		else
+			total=ObjHandle::GetInstance()->EnemyinProx(0,Vector3D(),10000);
 		//rand thing to rannd the type
 		//rand to rand the pos
 		if(total<5)
@@ -411,49 +431,19 @@ void Commander::Update()
 				}
 			}
 		}
-		if(!move&&(*it)->SLeader!=NULL)///means there is no attack order on this object
-		{
-			MessageStruc* temp=new MessageStruc;
-			temp->active=true;
-			temp->taken=false;
-			temp->general=false;
-			temp->m_Type=ORDER;
-			temp->m_Content=ATTACKHERE;
-			temp->target=objType::SQUAD_TYPE;
-			temp->priority=30+rand()%40;
-			temp->info=(*it)->pos;
-			MessageBoardGlobal::GetInstance(side)->SendMessage1(temp);
-			//send attack order
-		}
-	}
-	for(int i=0;i<5;i++)
-	{
-		bool move=false;
-		for(vector<MessageStruc*>::iterator it2=mb->messageList.begin();it2!=mb->messageList.end()&&!move;++it2)
-		{
-			if((*it2)->m_Content==ATTACKHERE)
-			{
-				Vector3D* temp=(Vector3D*)(*it2)->info;	
-				if( &fixedAttackPos[i]==temp)
-				{
-					move=true;
-					break;
-				}
-			}
-		}
-		if(!move)///means there is no attack order on this object
-		{
-			MessageStruc* temp=new MessageStruc;
-			temp->active=true;
-			temp->taken=false;
-			temp->general=false;
-			temp->m_Type=ORDER;
-			temp->m_Content=ATTACKHERE;
-			temp->target=objType::SQUAD_TYPE;
-			temp->priority=30+rand()%40;
-			temp->info=&fixedAttackPos[i];
-			MessageBoardGlobal::GetInstance(side)->SendMessage1(temp);
-			//send attack order
-		}	
+		//if(!move&&(*it)->SLeader!=NULL)///means there is no attack order on this object
+		//{
+		//	MessageStruc* temp=new MessageStruc;
+		//	temp->active=true;
+		//	temp->taken=false;
+		//	temp->general=false;
+		//	temp->m_Type=ORDER;
+		//	temp->m_Content=ATTACKHERE;
+		//	temp->target=objType::SQUAD_TYPE;
+		//	temp->priority=30+rand()%40;
+		//	temp->info=(*it)->pos;
+		//	MessageBoardGlobal::GetInstance(side)->SendMessage1(temp);
+		//	//send attack order
+		//}
 	}
 }

@@ -53,6 +53,7 @@ private:
 	bool m_keys[256]; // Array Used For The Keyboard Routine
 	int m_iWindows_Width, m_iWindows_Height;
 
+	int timeRef;
 	void BuildFont(void);
 	void KillFont(void);
 

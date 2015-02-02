@@ -197,119 +197,132 @@ void Soldier2::Update(float delta)
 				//send orders to squad
 				if(m_currentOrders!=NULL)//if not null
 				{
-					if(!squadBoard->sentOrders)
+					if(m_currentOrders->active==true)
 					{
-						switch(m_currentOrders->m_Content)
+						if(!squadBoard->sentOrders)
 						{
-						case ATTACKHERE:
+							switch(m_currentOrders->m_Content)
 							{
-								MessageStruc* temp=new MessageStruc;
-								temp->active=true;
-								temp->taken=false;
-								temp->general=true;
-								temp->m_Type=ORDER;
-								temp->m_Content=ATTACKHERE;
-								temp->target=objType::SOLDIER_TYPE;
-								temp->priority=0;
-								temp->info=m_currentOrders->info;
-								squadBoard->SendMessage1(temp);
-							}
-							break;
-						case RETREAT:
-							{
-								//if case for if near base
-								MessageStruc* temp=new MessageStruc;
-								temp->active=true;
-								temp->taken=false;
-								temp->general=false;
-								temp->m_Type=ORDER;
-								temp->m_Content=RECRUITING;
-								temp->priority=50;
-								temp->info=squadBoard;
-								messageBoardG->SendMessage1(temp);
-								squadBoard->sentMessages.push_back(temp);
-								//else 
-								//carry on retreating
-							}
-						}
-						squadBoard->sentOrders=true;
-					}
-					bool changedState=false;//to check if state has been changed
-				
-					SwitchState();
-					//shooting part
-				
-					if(m_stats.reloading)
-					{
-						if(m_stats.ammo>5)
-						{
-							m_stats.reloading=0;
-						}
-						else
-						{
-							if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
-							{
-								m_stats.ammo++;
-							}
-						}
-					}
-					if(ObjHandle::GetInstance()->EnemyinProx(side,pos,100)>1)
-					{
-						if(m_stats.ammo<=0&&!m_stats.reloading)
-						{
-							MVCTime::GetInstance()->SetLimit(m_stats.bulletRef,1000);
-							m_stats.reloading=true;
-						}
-						else if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
-						{
-							m_stats.ammo--;
-							atkTarget=ObjHandle::GetInstance()->EnemytoShoot(side,pos,100);
-							Shoot();
-						}
-						changedState=true;
-					}
-					//do testing for normal states
-					//will be a normal state machine
-					//idle will be use orders
-
-					//switch state(only test conditions)
-
-					if(!changedState)
-					{
-						switch(m_currentOrders->m_Content)
-						{
-						case ATTACKHERE:
-							{
-								Vector3D atkPos=*(Vector3D*)(m_currentOrders->info);
-								if((this->pos-atkPos).GetMagnitudeSquare()>100)//within 10 units
+							case ATTACKHERE:
 								{
-									Vector3D dir=atkPos-this->pos;
-									dir.NormalizeVector3D();
-									this->pos=pos+dir*delta*50;
-									//state = movestate
+									MessageStruc* temp=new MessageStruc;
+									temp->active=true;
+									temp->taken=false;
+									temp->general=true;
+									temp->m_Type=ORDER;
+									temp->m_Content=ATTACKHERE;
+									temp->target=objType::SOLDIER_TYPE;
+									temp->priority=0;
+									temp->info=m_currentOrders->info;
+									squadBoard->SendMessage1(temp);
 								}
-								else
+								break;
+							case RETREAT:
 								{
-									for(vector<MessageStruc*>::iterator it=squadBoard->messageList.begin();it!=squadBoard->messageList.end();)
+									//if case for if near base
+									MessageStruc* temp=new MessageStruc;
+									temp->active=true;
+									temp->taken=false;
+									temp->general=false;
+									temp->m_Type=ORDER;
+									temp->m_Content=RECRUITING;
+									temp->priority=50;
+									temp->info=squadBoard;
+									messageBoardG->SendMessage1(temp);
+									squadBoard->sentMessages.push_back(temp);
+									//else 
+									//carry on retreating
+								}
+							}
+							squadBoard->sentOrders=true;
+						}
+						bool changedState=false;//to check if state has been changed
+				
+						SwitchState();
+						//shooting part
+				
+						if(m_stats.reloading)
+						{
+							if(m_stats.ammo>5)
+							{
+								m_stats.reloading=0;
+							}
+							else
+							{
+								if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
+								{
+									m_stats.ammo++;
+								}
+							}
+						}
+						if(ObjHandle::GetInstance()->EnemyinProx(side,pos,100)>1)
+						{
+							if(m_stats.ammo<=0&&!m_stats.reloading)
+							{
+								MVCTime::GetInstance()->SetLimit(m_stats.bulletRef,1000);
+								m_stats.reloading=true;
+							}
+							else if(MVCTime::GetInstance()->TestTime(m_stats.bulletRef))
+							{
+								//m_stats.ammo--;
+								atkTarget=ObjHandle::GetInstance()->EnemytoShoot(side,pos,100);
+								Shoot();
+							}
+							changedState=true;
+						}
+						//do testing for normal states
+						//will be a normal state machine
+						//idle will be use orders
+
+						//switch state(only test conditions)
+
+						if(!changedState)
+						{
+							switch(m_currentOrders->m_Content)
+							{
+							case ATTACKHERE:
+								{
+									Vector3D atkPos=*(Vector3D*)(m_currentOrders->info);
+									if((this->pos-atkPos).GetMagnitudeSquare()>100)//within 10 units
 									{
-										if((*it)->m_Content==ATTACKHERE)
-										{
-											(*it)->active=false;
-										}
-										++it;
+										Vector3D dir=atkPos-this->pos;
+										dir.NormalizeVector3D();
+										this->pos=pos+dir*delta*50;
+										//state = movestate
 									}
-									m_currentOrders->active=false;
-									m_currentOrders=NULL;
-									squadBoard->sentOrders=false;
+									else
+									{
+										for(vector<MessageStruc*>::iterator it=squadBoard->messageList.begin();it!=squadBoard->messageList.end();)
+										{
+											if((*it)->m_Content==ATTACKHERE)
+											{
+												(*it)->active=false;
+											}
+											++it;
+										}
+										m_currentOrders->taken=false;
+										m_currentOrders->priority=30+rand()%40;
+										m_currentOrders=NULL;
+										squadBoard->sentOrders=false;
+									}
 								}
+								break;
 							}
-							break;
 						}
 					}
 				}
-				else if(true)//testing for near base
+				else //testing for near base
 				{
-					if(squadBoard->SMember.size()<10)
+					recruiting=true;
+					float distSquare;
+					if(side==0)
+					{
+						distSquare=(pos-Vector3D(150,400,0)).GetMagnitudeSquare();
+					}
+					else
+						distSquare=(pos-Vector3D(800,400,0)).GetMagnitudeSquare();
+					if(distSquare<40000)///sqrt of 40000 is 200
+						//there are no orders and its near the base
 					{
 						bool send=true;
 						for(vector<MessageStruc*>::iterator it=squadBoard->sentMessages.begin();it!=squadBoard->sentMessages.end();)
@@ -318,6 +331,13 @@ void Soldier2::Update(float delta)
 							{
 								send=false;
 								break;
+							}
+						}
+						for(vector<MessageStruc*>::iterator it=squadBoard->messageList.begin();it!=squadBoard->messageList.end();++it)
+						{
+							if((*it)->m_Content==RETREAT)
+							{
+								(*it)->active=false;
 							}
 						}
 						if(send)
@@ -334,6 +354,41 @@ void Soldier2::Update(float delta)
 							MessageBoardGlobal::GetInstance(side)->SendMessage1(temp);
 							squadBoard->sentMessages.push_back(temp);
 						}
+					}
+					else
+					{
+						bool sentRetreat=false;
+						for(vector<MessageStruc*>::iterator it=squadBoard->messageList.begin();it!=squadBoard->messageList.end();++it)
+						{
+							if((*it)->m_Content==RETREAT)
+							{
+								sentRetreat=true;
+							}
+						}
+						if(!sentRetreat)
+						{
+							MessageStruc* temp=new MessageStruc;
+							temp->active=true;
+							temp->taken=false;
+							temp->general=true;
+							temp->m_Type=ORDER;
+							temp->m_Content=RETREAT;
+							temp->target=objType::SOLDIER_TYPE;
+							temp->priority=80;
+							squadBoard->SendMessage1(temp);
+							squadBoard->sentOrders=true;
+						}
+						Vector3D dir;
+						if(side==0)
+						{
+							dir=Vector3D(150,400,0)-this->pos;
+						}
+						else
+						{
+							dir=Vector3D(800,400,0)-this->pos;
+						}
+							dir.NormalizeVector3D();
+							this->pos=pos+dir*delta*50;
 					}
 				}
 			}
@@ -354,32 +409,7 @@ void Soldier2::Update(float delta)
 				}
 			}
 			else
-			if(squadBoard!=NULL)
 			{
-				if(m_currentOrders==NULL)
-				{
-					m_currentOrders=this->squadBoard->GetMessage1(this,ORDER);
-					if(m_currentOrders!=NULL)
-						if(m_currentOrders->general==false)
-						{
-							m_currentOrders->taken=true;
-						}
-				}
-				else
-				{
-					MessageStruc* temp=squadBoard->GetMessage1(this,ORDER);
-					if(temp!=NULL)
-					{
-						if(temp->priority>m_currentOrders->priority)
-						{
-							if(temp->general==false)
-								temp->taken=true;
-							m_currentOrders->taken=false;
-							m_currentOrders=temp;
-						}
-					}
-				}
-
 				//switch state
 			
 				bool changedState=false;//to check if state has been changed
@@ -416,12 +446,37 @@ void Soldier2::Update(float delta)
 					}
 					changedState=true;
 				}
-				//do testing for normal states
-				//will be a normal state machine
-				//idle will be use orders
-
-				if(!changedState)
+				if(squadBoard!=NULL)
 				{
+					if(m_currentOrders==NULL)
+					{
+						m_currentOrders=this->squadBoard->GetMessage1(this,ORDER);
+						if(m_currentOrders!=NULL)
+							if(m_currentOrders->general==false)
+							{
+								m_currentOrders->taken=true;
+							}
+					}
+					else
+					{
+						MessageStruc* temp=squadBoard->GetMessage1(this,ORDER);
+						if(temp!=NULL)
+						{
+							if(temp->priority>m_currentOrders->priority)
+							{
+								if(temp->general==false)
+									temp->taken=true;
+								m_currentOrders->taken=false;
+								m_currentOrders=temp;
+							}
+						}
+					}
+
+					
+					//do testing for normal states
+					//will be a normal state machine
+					//idle will be use orders
+
 					if(m_currentOrders!=NULL)
 					{
 						switch(m_currentOrders->m_Content)
@@ -436,42 +491,68 @@ void Soldier2::Update(float delta)
 							break;
 						case ATTACKHERE:
 							{
-								Vector3D atkPos=*(Vector3D*)(m_currentOrders->info);
-								if((this->pos-atkPos).GetMagnitudeSquare()>100)//within 10 units
+								if(!changedState)
 								{
-									Vector3D dir=atkPos-this->pos;
-									dir.NormalizeVector3D();
-									this->pos=pos+dir*delta*50;
-									//state = movestate
-								}
-								else
-								{
-									m_currentOrders=NULL;
+									Vector3D atkPos=*(Vector3D*)(m_currentOrders->info);
+									if((this->pos-atkPos).GetMagnitudeSquare()>100)//within 10 units
+									{
+										Vector3D dir=atkPos-this->pos;
+										dir.NormalizeVector3D();
+										this->pos=pos+dir*delta*50;
+										//state = movestate
+									}
+									else
+									{
+										m_currentOrders=NULL;
+									}
 								}
 							}
 							break;
+						case RETREAT:
+							{
+								float distSquare;
+								if(side==0)
+								{
+									distSquare=(pos-Vector3D(150,400,0)).GetMagnitudeSquare();
+								}
+								else
+									distSquare=(pos-Vector3D(800,400,0)).GetMagnitudeSquare();
+								if(distSquare>=40000)///sqrt of 40000 is 200
+								{
+									Vector3D dir;
+									if(side==0)
+									{
+										dir=Vector3D(150,400,0)-this->pos;
+									}
+									else
+									{
+										dir=Vector3D(800,400,0)-this->pos;
+									}
+										dir.NormalizeVector3D();
+									this->pos=pos+dir*delta*50;
+								}
+							}
 						}
 					}
 				}
-			}
-			else//no squadboard aka nosquad type
-			{
-				if(!reqSquad)
+				else//no squadboard aka nosquad type
 				{
-					MessageStruc* temp=new MessageStruc;
-					temp->active=true;
-					temp->taken=false;
-					temp->general=false;
-					temp->m_Type=REPORT;
-					temp->m_Content=FINDINGSQUAD;
-					temp->priority=50;
-					temp->info=this;
-					MessageBoardGlobal::GetInstance(side)->SendMessage1(temp);
-					reqSquad=true;
+					if(!reqSquad)
+					{
+						MessageStruc* temp=new MessageStruc;
+						temp->active=true;
+						temp->taken=false;
+						temp->general=false;
+						temp->m_Type=REPORT;
+						temp->m_Content=FINDINGSQUAD;
+						temp->priority=50;
+						temp->info=this;
+						MessageBoardGlobal::GetInstance(side)->SendMessage1(temp);
+						reqSquad=true;
+					}
 				}
 			}
 		}
-		
 	}
 	//update stuff
 
