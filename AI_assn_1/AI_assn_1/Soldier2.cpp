@@ -58,29 +58,44 @@ void Soldier2::Draw()
 		//	glColor3f(1.0,0.0,1.0);
 		//}
 		//else
-		if(m_isLeader==true)
-		{
-			//glColor4f(squadBoard->SquadColor.m_x,squadBoard->SquadColor.m_y,squadBoard->SquadColor.m_z,0.5);
-		}
-		else if(m_objType==SOLDIER_TYPE)
-		{
-			//glColor4f(squadBoard->SquadColor.m_x,squadBoard->SquadColor.m_y,squadBoard->SquadColor.m_z,1);
-		}
-		else if(m_objType==NOSQUAD_TYPE)
-		{
-			glColor3f(0.0f,0.0f,1.0f);
-		}
-		else
-		{
-			glColor3f(0.0f,0.0f,0.f);
-		}
 		if(side==0)
 		{
-			glColor3f(1,1,0);
+			if(m_isLeader==true)
+			{
+				glColor3f(1,0,0);
+			}
+			else if(m_objType==SOLDIER_TYPE)
+			{
+				glColor3f(1,1,0);
+			}
+			else if(m_objType==NOSQUAD_TYPE)
+			{
+				glColor3f(0.0f,0.0f,1.0f);
+			}
+			else
+			{
+				glColor3f(0.0f,0.0f,0.f);
+			}
 		}
 		else
 		{
-			glColor3f(0,1,1);
+			if(m_isLeader==true)
+			{
+				glColor3f(0,1,0);
+			}
+			else if(m_objType==SOLDIER_TYPE)
+			{
+				glColor3f(1,1,1);
+			}
+			else if(m_objType==NOSQUAD_TYPE)
+			{
+				glColor3f(0.0f,0.0f,1.0f);
+			}
+			else
+			{
+				glColor3f(0.0f,0.0f,0.f);
+			}
+
 		}
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
